@@ -69,7 +69,7 @@ export default function PlayerPage({ params }: { params: Promise<{ id: string }>
     const onReady = () => {
       ytReadyRef.current = true;
       const vid = currentYoutubeIdRef.current;
-      if (vid) ytPlayerRef.current.cueVideoById(vid);
+      if (vid) ytPlayerRef.current?.cueVideoById(vid);
     };
 
     const createPlayer = (videoId: string) => {
