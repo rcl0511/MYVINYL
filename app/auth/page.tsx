@@ -1,11 +1,16 @@
+"use client";
+
+import { useState } from "react";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 
 const SOCIAL_BTNS = [
   {
+    id: "google",
     label: "Google로 계속하기",
     bg: "bg-white",
-    text: "text-lp-primary",
-    border: "border border-lp-border",
+    text: "text-[#111]",
+    border: "border border-gray-200",
     icon: (
       <svg className="w-5 h-5" viewBox="0 0 24 24">
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -16,6 +21,7 @@ const SOCIAL_BTNS = [
     ),
   },
   {
+    id: "kakao",
     label: "카카오로 계속하기",
     bg: "bg-[#FEE500]",
     text: "text-[#191919]",
@@ -27,55 +33,117 @@ const SOCIAL_BTNS = [
     ),
   },
   {
+    id: "naver",
     label: "네이버로 계속하기",
     bg: "bg-[#03C75A]",
     text: "text-white",
     border: "",
-    icon: (
-      <span className="text-white font-bold text-sm leading-none">N</span>
-    ),
+    icon: <span className="text-white font-bold text-sm leading-none">N</span>,
   },
 ];
 
 export default function AuthPage() {
+  const [loading, setLoading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSocialLogin = async (providerId: string) => {
+    setLoading(providerId);
+    setError(null);
+    try {
+      await signIn(providerId, { callbackUrl: "/" });
+    } catch {
+      setError("로그인 중 오류가 발생했습니다. 다시 시도해주세요.");
+      setLoading(null);
+    }
+  };
+
   return (
-    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-lp-bg px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl border border-lp-border shadow-lg overflow-hidden">
-        {/* Header */}
-        <div className="px-10 pt-10 pb-6 text-center">
-          <div className="w-16 h-16 rounded-full bg-lp-accent-btn mx-auto mb-4 flex items-center justify-center">
-            <span className="text-white text-2xl font-bold">LP</span>
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a1a] via-[#1a1a2e] to-[#0f0f23] flex items-center justify-center px-4 relative overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+      </div>
+
+      <div className="relative z-10 w-full max-w-md">
+        {/* Back button */}
+        <Link
+          href="/intro"
+          className="inline-flex items-center gap-2 text-white/60 hover:text-white transition-colors mb-6"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path d="M19 12H5M5 12l7 7M5 12l7-7" />
+          </svg>
+          <span className="text-sm">뒤로가기</span>
+        </Link>
+
+        <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
+          {/* Header */}
+          <div className="px-10 pt-10 pb-6 text-center">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 mx-auto mb-4 flex items-center justify-center shadow-lg">
+              <span className="text-white text-3xl font-bold">LP</span>
+            </div>
+            <h1 className="text-2xl font-bold text-white">LP Player</h1>
+            <p className="text-gray-300 text-sm mt-2">
+              로그인하고 LP 감상을 시작하세요
+            </p>
           </div>
-          <h1 className="text-2xl font-bold text-lp-primary">LP Player</h1>
-          <p className="text-lp-secondary text-sm mt-2">
-            로그인하고 LP 감상을 시작하세요
-          </p>
+
+          <div className="mx-10 border-t border-white/10" />
+
+          {/* Social buttons */}
+          <div className="px-10 py-8 space-y-3">
+            {error && (
+              <p className="text-red-400 text-xs text-center mb-2">{error}</p>
+            )}
+            {SOCIAL_BTNS.map(({ id, label, bg, text, border, icon }) => (
+              <button
+                key={id}
+                onClick={() => handleSocialLogin(id)}
+                disabled={loading !== null}
+                className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-medium text-sm transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed ${bg} ${text} ${border}`}
+              >
+                <span className="w-6 h-6 flex items-center justify-center shrink-0">
+                  {loading === id ? (
+                    <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                  ) : (
+                    icon
+                  )}
+                </span>
+                <span className="flex-1 text-center">
+                  {loading === id ? "로그인 중..." : label}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {/* Terms notice */}
+          <div className="px-10 pb-8 text-center">
+            <p className="text-gray-400 text-xs leading-relaxed">
+              가입 시{" "}
+              <Link href="/terms" className="underline hover:text-white transition-colors">
+                이용약관
+              </Link>
+              {" "}및{" "}
+              <Link href="/terms" className="underline hover:text-white transition-colors">
+                개인정보처리방침
+              </Link>
+              {" "}에 동의하게 됩니다.
+            </p>
+          </div>
         </div>
 
-        <div className="mx-10 border-t border-lp-border" />
-
-        {/* Social buttons */}
-        <div className="px-10 py-8 space-y-3">
-          {SOCIAL_BTNS.map(({ label, bg, text, border, icon }) => (
-            <button
-              key={label}
-              className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-medium text-sm transition-opacity hover:opacity-90 ${bg} ${text} ${border}`}
-            >
-              <span className="w-6 h-6 flex items-center justify-center shrink-0">{icon}</span>
-              <span className="flex-1 text-center">{label}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Terms notice */}
-        <div className="px-10 pb-8 text-center">
-          <p className="text-lp-tertiary text-xs leading-relaxed">
-            가입 시{" "}
-            <Link href="/terms" className="underline hover:text-lp-accent">이용약관</Link>
-            {" "}및{" "}
-            <Link href="/terms" className="underline hover:text-lp-accent">개인정보처리방침</Link>
-            에 동의하게 됩니다.
-          </p>
+        {/* Help link */}
+        <div className="text-center mt-6">
+          <Link
+            href="/support"
+            className="text-sm text-gray-400 hover:text-white transition-colors"
+          >
+            로그인이 안되시나요?
+          </Link>
         </div>
       </div>
     </div>

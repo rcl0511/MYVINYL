@@ -5,6 +5,12 @@ export interface Track {
   duration: string; // "m:ss"
   side: "A" | "B";
   youtubeId?: string;
+  lyrics?: LyricLine[]; // 가사 데이터
+}
+
+export interface LyricLine {
+  time: number; // 초 단위
+  text: string;
 }
 
 export type VinylStyle = "standard" | "color" | "splatter" | "marble";
