@@ -1,65 +1,99 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState } from "react";
+import LPCard from "@/components/lp/LPCard";
+import Chip from "@/components/ui/Chip";
+import { MOCK_LPS, GENRES } from "@/lib/mock-data";
+
+export default function BrowsePage() {
+  const [selectedGenre, setSelectedGenre] = useState("전체");
+  const [query, setQuery] = useState("");
+
+  const filtered = MOCK_LPS.filter((lp) => {
+    const matchGenre = selectedGenre === "전체" || lp.genre === selectedGenre;
+    const matchQuery =
+      !query ||
+      lp.title.toLowerCase().includes(query.toLowerCase()) ||
+      lp.artist.toLowerCase().includes(query.toLowerCase());
+    return matchGenre && matchQuery;
+  });
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="max-w-[1440px] mx-auto px-8 py-8">
+      {/* Hero */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-lp-primary mb-2">LP 탐색</h1>
+        <p className="text-lp-secondary text-sm">
+          {MOCK_LPS.length}장의 LP를 가상 턴테이블로 감상하세요
+        </p>
+      </div>
+
+      {/* Search bar */}
+      <div className="relative mb-6">
+        <div className="flex items-center bg-white border border-lp-border rounded-xl overflow-hidden shadow-sm">
+          <div className="pl-4 pr-2 text-lp-tertiary">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+          </div>
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="LP 제목, 아티스트, 장르 검색..."
+            className="flex-1 px-3 py-3.5 text-sm outline-none text-lp-primary placeholder:text-lp-tertiary bg-transparent"
+          />
+          {query && (
+            <button
+              onClick={() => setQuery("")}
+              className="px-3 text-lp-tertiary hover:text-lp-secondary"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              ×
+            </button>
+          )}
+          <button className="px-6 py-3.5 bg-lp-accent text-white text-sm font-medium hover:bg-lp-accent-btn transition-colors">
+            검색
+          </button>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </div>
+
+      {/* Genre filter chips */}
+      <div className="flex items-center gap-2 mb-8 overflow-x-auto pb-1">
+        {GENRES.map((genre) => (
+          <Chip
+            key={genre}
+            label={genre}
+            active={selectedGenre === genre}
+            onClick={() => setSelectedGenre(genre)}
+          />
+        ))}
+      </div>
+
+      {/* Results count */}
+      {query && (
+        <p className="text-lp-secondary text-sm mb-4">
+          &ldquo;{query}&rdquo; 검색 결과 {filtered.length}건
+        </p>
+      )}
+
+      {/* LP Grid */}
+      {filtered.length > 0 ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+          {filtered.map((lp) => (
+            <LPCard key={lp.id} lp={lp} />
+          ))}
         </div>
-      </main>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-24 text-lp-tertiary">
+          <svg className="w-16 h-16 mb-4 opacity-30" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+          <p className="text-base font-medium">검색 결과가 없습니다</p>
+          <p className="text-sm mt-1">다른 키워드나 장르를 선택해보세요</p>
+        </div>
+      )}
     </div>
   );
 }

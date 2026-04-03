@@ -1,26 +1,71 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* LP Player Design Tokens */
+  --color-lp-bg:            #F5F5F5;
+  --color-lp-white:         #FFFFFF;
+  --color-lp-nav:           #1A1A1A;
+  --color-lp-primary:       #111827;
+  --color-lp-secondary:     #6B7280;
+  --color-lp-tertiary:      #9CA3AF;
+  --color-lp-placeholder:   #D9D9D9;
+  --color-lp-border:        #E5E7EB;
+  --color-lp-accent:        #5B21B6;
+  --color-lp-accent-light:  #EDE9F8;
+  --color-lp-accent-btn:    #7C3AED;
+  --color-lp-success:       #10B981;
+  --color-lp-warning:       #F59E0B;
+  --color-lp-danger:        #EF4444;
+  --color-lp-chip:          #F3F4F6;
+  --color-lp-sidebar:       #FAFAFA;
+
+  --font-sans: 'Inter', system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  font-family: var(--font-sans);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-lp-bg);
+  color: var(--color-lp-primary);
+}
+
+/* Turntable spin animation */
+@keyframes spin-lp {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.animate-spin-lp {
+  animation: spin-lp 2s linear infinite;
+}
+
+.animate-spin-lp.paused {
+  animation-play-state: paused;
+}
+
+/* Needle swing animation */
+@keyframes needle-play {
+  from { transform: rotate(-25deg); }
+  to   { transform: rotate(0deg); }
+}
+
+.needle-playing {
+  animation: needle-play 0.5s ease forwards;
+}
+
+.needle-paused {
+  transform: rotate(-25deg);
+  transition: transform 0.5s ease;
+}
+
+/* Glow pulse for playing state */
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.8; }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
