@@ -19,10 +19,10 @@ export default function BrowsePage() {
   });
 
   return (
-    <div className="max-w-[1440px] mx-auto px-8 py-8">
+    <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-6 sm:py-8">
       {/* Hero */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-lp-primary mb-2">LP 탐색</h1>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-lp-primary mb-2">LP 탐색</h1>
         <p className="text-lp-secondary text-sm">
           {MOCK_LPS.length}장의 LP를 가상 턴테이블로 감상하세요
         </p>

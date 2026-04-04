@@ -60,15 +60,15 @@ export default function ShopPage() {
   }
 
   return (
-    <div className="max-w-[1440px] mx-auto px-8 py-8">
+    <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-6 sm:py-8">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-lp-primary mb-2">아이템 상점</h1>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-lp-primary mb-2">아이템 상점</h1>
         <p className="text-lp-secondary text-sm">턴테이블과 LP를 나만의 스타일로 꾸며보세요</p>
       </div>
 
       {/* Category tabs */}
-      <div className="flex gap-1 mb-8 border-b border-lp-border">
+      <div className="flex gap-1 mb-6 sm:mb-8 border-b border-lp-border overflow-x-auto">
         {CATEGORIES.map(({ key, label }) => (
           <button
             key={key}
@@ -187,12 +187,12 @@ export default function ShopPage() {
       </div>
 
       {/* Coin balance banner */}
-      <div className="mt-12 bg-gradient-to-r from-lp-accent to-lp-accent-btn rounded-2xl px-8 py-6 flex items-center justify-between text-white">
+      <div className="mt-10 sm:mt-12 bg-gradient-to-r from-lp-accent to-lp-accent-btn rounded-2xl px-6 sm:px-8 py-5 sm:py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-white">
         <div>
           <p className="text-white/70 text-sm">보유 포인트</p>
-          <p className="text-3xl font-bold mt-1">5,000 P</p>
+          <p className="text-2xl sm:text-3xl font-bold mt-1">5,000 P</p>
         </div>
-        <button className="px-6 py-3 bg-white text-lp-accent font-semibold rounded-xl text-sm hover:bg-white/90 transition-colors">
+        <button className="w-full sm:w-auto px-6 py-3 bg-white text-lp-accent font-semibold rounded-xl text-sm hover:bg-white/90 transition-colors text-center">
           포인트 충전
         </button>
       </div>

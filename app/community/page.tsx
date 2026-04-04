@@ -17,9 +17,9 @@ export default function CommunityPage() {
     : MOCK_POSTS.filter((p) => p.tag === activeTag);
 
   return (
-    <div className="min-h-[calc(100vh-64px)] flex max-w-[1440px] mx-auto">
-      {/* Left sidebar: topics + following */}
-      <aside className="w-72 shrink-0 border-r border-lp-border bg-lp-sidebar px-6 py-8">
+    <div className="min-h-[calc(100vh-64px)] flex max-w-[1440px] mx-auto overflow-x-hidden">
+      {/* Left sidebar: topics + following — tablet 이하 숨김 */}
+      <aside className="hidden lg:block w-72 shrink-0 border-r border-lp-border bg-lp-sidebar px-6 py-8">
         <h2 className="text-sm font-semibold text-lp-primary mb-3">인기 토픽</h2>
         <div className="space-y-1.5">
           {TAGS.slice(1).map((tag, i) => (
@@ -60,19 +60,24 @@ export default function CommunityPage() {
       {/* Center: feed */}
       <div className="flex-1 overflow-y-auto">
         {/* Feed header */}
-        <div className="sticky top-0 z-10 bg-white border-b border-lp-border px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-lp-primary">커뮤니티</h1>
-            <div className="flex gap-1.5">
-              {["전체", ...TAGS.slice(1)].map((tag) => (
-                <Chip key={tag} label={tag} active={activeTag === tag} onClick={() => setActiveTag(tag)} />
-              ))}
-            </div>
+        <div className="sticky top-0 z-10 bg-white border-b border-lp-border px-4 sm:px-8 py-3 sm:py-4">
+          <div className="flex items-center justify-between mb-2 sm:mb-0">
+            <h1 className="text-lg sm:text-xl font-bold text-lp-primary">커뮤니티</h1>
+            <Button size="sm">글쓰기</Button>
           </div>
-          <Button size="sm">글쓰기</Button>
+          <div className="flex gap-1.5 overflow-x-auto pb-1 sm:pb-0 mt-2 sm:mt-0 sm:hidden">
+            {["전체", ...TAGS.slice(1)].map((tag) => (
+              <Chip key={tag} label={tag} active={activeTag === tag} onClick={() => setActiveTag(tag)} />
+            ))}
+          </div>
+          <div className="hidden sm:flex items-center gap-1.5 mt-2 flex-wrap">
+            {["전체", ...TAGS.slice(1)].map((tag) => (
+              <Chip key={tag} label={tag} active={activeTag === tag} onClick={() => setActiveTag(tag)} />
+            ))}
+          </div>
         </div>
 
-        <div className="px-8 py-6 space-y-4">
+        <div className="px-4 sm:px-8 py-4 sm:py-6 space-y-4">
           {filtered.map((post) => (
             <article
               key={post.id}
@@ -122,8 +127,8 @@ export default function CommunityPage() {
         </div>
       </div>
 
-      {/* Right sidebar: trending LPs */}
-      <aside className="w-80 shrink-0 border-l border-lp-border bg-lp-sidebar px-6 py-8">
+      {/* Right sidebar: trending LPs — 넓은 화면에서만 */}
+      <aside className="hidden xl:block w-80 shrink-0 border-l border-lp-border bg-lp-sidebar px-6 py-8">
         <h2 className="text-sm font-semibold text-lp-primary mb-4">지금 인기 있는 LP</h2>
         <div className="space-y-4">
           {MOCK_LPS.slice(0, 5).map((lp, i) => (

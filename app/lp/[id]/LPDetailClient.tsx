@@ -33,9 +33,9 @@ export default function LPDetailClient({ lp }: { lp: LP }) {
 
   return (
     <>
-      <div className="min-h-[calc(100vh-64px)] flex">
+      <div className="min-h-[calc(100vh-64px)] flex flex-col md:flex-row">
         {/* Left panel */}
-        <div className="w-[440px] shrink-0 bg-lp-bg flex flex-col items-center px-10 py-10">
+        <div className="w-full md:w-[440px] md:shrink-0 bg-lp-bg flex flex-col items-center px-6 sm:px-10 py-8 md:py-10">
           {/* Back */}
           <div className="w-full mb-6">
             <Link
@@ -132,9 +132,9 @@ export default function LPDetailClient({ lp }: { lp: LP }) {
 
         {/* Right panel */}
         <div className="flex-1 bg-white overflow-y-auto">
-          <div className="max-w-3xl px-12 py-10">
+          <div className="max-w-3xl px-4 sm:px-8 md:px-12 py-6 md:py-10">
             {/* Title */}
-            <h1 className="text-4xl font-bold text-lp-primary leading-tight">{lp.title}</h1>
+            <h1 className="text-2xl sm:text-4xl font-bold text-lp-primary leading-tight">{lp.title}</h1>
             <p className="text-lp-secondary mt-2 text-base">
               {lp.artist} · {lp.year} · {lp.genre} · {lp.label}
             </p>

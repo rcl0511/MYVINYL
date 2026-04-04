@@ -20,26 +20,6 @@ const SOCIAL_BTNS = [
       </svg>
     ),
   },
-  {
-    id: "kakao",
-    label: "카카오로 계속하기",
-    bg: "bg-[#FEE500]",
-    text: "text-[#191919]",
-    border: "",
-    icon: (
-      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="#191919">
-        <path d="M12 3C6.477 3 2 6.477 2 10.8c0 2.7 1.7 5.07 4.26 6.48L5.2 21l4.17-2.76A11.6 11.6 0 0 0 12 18.6c5.523 0 10-3.477 10-7.8S17.523 3 12 3z" />
-      </svg>
-    ),
-  },
-  {
-    id: "naver",
-    label: "네이버로 계속하기",
-    bg: "bg-[#03C75A]",
-    text: "text-white",
-    border: "",
-    icon: <span className="text-white font-bold text-sm leading-none">N</span>,
-  },
 ];
 
 export default function AuthPage() {

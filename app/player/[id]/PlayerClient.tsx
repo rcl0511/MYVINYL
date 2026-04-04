@@ -384,20 +384,20 @@ export default function PlayerClient({ lp }: { lp: LP }) {
         {/* Prev LP ghost */}
         <button
           onClick={() => router.push(`/player/${prevLp.id}`)}
-          className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 group z-10 transition-all duration-700"
+          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 group z-10 transition-all duration-700"
           style={{ opacity: uiVisible ? 0.4 : 0, pointerEvents: uiVisible ? "auto" : "none" }}
         >
           <div
-            className="w-14 h-14 rounded-full group-hover:scale-110 transition-transform"
+            className="w-10 h-10 sm:w-14 sm:h-14 rounded-full group-hover:scale-110 transition-transform"
             style={{
               background: `conic-gradient(from 0deg, ${prevLp.coverColor}, #111 40%, ${prevLp.coverColor}88)`,
               boxShadow: "0 4px 20px rgba(0,0,0,0.6)",
             }}
           />
-          <p className="text-white/50 text-[10px] group-hover:text-white/80 transition-colors max-w-[72px] text-center truncate">
+          <p className="hidden sm:block text-white/50 text-[10px] group-hover:text-white/80 transition-colors max-w-[72px] text-center truncate">
             {prevLp.title}
           </p>
-          <svg className="w-4 h-4 text-white/30 group-hover:text-white/60 -mt-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-white/30 group-hover:text-white/60 sm:-mt-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path d="M15 19l-7-7 7-7" />
           </svg>
         </button>
@@ -424,29 +424,28 @@ export default function PlayerClient({ lp }: { lp: LP }) {
         {/* Next LP ghost */}
         <button
           onClick={() => router.push(`/player/${nextLp.id}`)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 group z-10 transition-all duration-700"
+          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 group z-10 transition-all duration-700"
           style={{ opacity: uiVisible ? 0.4 : 0, pointerEvents: uiVisible ? "auto" : "none" }}
         >
           <div
-            className="w-14 h-14 rounded-full group-hover:scale-110 transition-transform"
+            className="w-10 h-10 sm:w-14 sm:h-14 rounded-full group-hover:scale-110 transition-transform"
             style={{
               background: `conic-gradient(from 0deg, ${nextLp.coverColor}, #111 40%, ${nextLp.coverColor}88)`,
               boxShadow: "0 4px 20px rgba(0,0,0,0.6)",
             }}
           />
-          <p className="text-white/50 text-[10px] group-hover:text-white/80 transition-colors max-w-[72px] text-center truncate">
+          <p className="hidden sm:block text-white/50 text-[10px] group-hover:text-white/80 transition-colors max-w-[72px] text-center truncate">
             {nextLp.title}
           </p>
-          <svg className="w-4 h-4 text-white/30 group-hover:text-white/60 -mt-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-white/30 group-hover:text-white/60 sm:-mt-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path d="M9 5l7 7-7 7" />
           </svg>
         </button>
 
         {/* ── Track list drawer ── */}
         <div
-          className="absolute top-0 bottom-0 left-0 z-20 flex flex-col"
+          className="absolute top-0 bottom-0 left-0 z-20 flex flex-col w-full sm:w-[300px]"
           style={{
-            width: 300,
             transform: showTracklist ? "translateX(0)" : "translateX(-100%)",
             transition: "transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)",
             background: "rgba(5,5,15,0.92)",
@@ -459,6 +458,15 @@ export default function PlayerClient({ lp }: { lp: LP }) {
               <p className="text-white/80 font-semibold text-sm">{lp.title}</p>
               <p className="text-white/35 text-xs mt-0.5">{side}면 · {sideTracks.length}트랙</p>
             </div>
+            {/* Mobile close button */}
+            <button
+              className="sm:hidden w-8 h-8 flex items-center justify-center text-white/40 hover:text-white ml-2"
+              onClick={() => setShowTracklist(false)}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+            </button>
             {/* A/B */}
             <div className="flex gap-0 rounded-full overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.12)" }}>
               {(["A", "B"] as LPSide[]).map((s) => (

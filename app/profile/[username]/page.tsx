@@ -76,12 +76,12 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   const collectionLPs = MOCK_LPS.slice(0, 6);
 
   return (
-    <div className="max-w-[1100px] mx-auto px-8 py-10">
+    <div className="max-w-[1100px] mx-auto px-4 sm:px-8 py-6 sm:py-10">
       {/* Profile header */}
-      <div className="flex items-start gap-8 mb-10">
+      <div className="flex flex-col sm:flex-row items-start gap-5 sm:gap-8 mb-8 sm:mb-10">
         {/* Avatar */}
         <div
-          className="w-28 h-28 rounded-full shrink-0 flex items-center justify-center text-white text-3xl font-bold shadow-lg"
+          className="w-20 h-20 sm:w-28 sm:h-28 rounded-full shrink-0 flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow-lg"
           style={{ backgroundColor: user.avatarColor }}
         >
           {user.nickname.slice(0, 1).toUpperCase()}
@@ -89,8 +89,8 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
         {/* Info */}
         <div className="flex-1">
-          <div className="flex items-center gap-4 mb-2">
-            <h1 className="text-2xl font-bold text-lp-primary">{user.nickname}</h1>
+          <div className="flex flex-wrap items-center gap-3 mb-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-lp-primary">{user.nickname}</h1>
             {isMe ? (
               <div className="flex gap-2">
                 <button
