@@ -29,41 +29,83 @@ export default function GNB() {
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-3 mr-6 sm:mr-12 shrink-0 group"
+          className="flex items-center gap-2.5 mr-6 sm:mr-12 shrink-0 group"
           onClick={() => setMobileOpen(false)}
         >
-          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" className="w-9 h-9 transition-transform duration-500 ease-out group-hover:rotate-[25deg]">
+          {/* Premium vinyl record icon */}
+          <svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" className="w-9 h-9 transition-transform duration-700 ease-out group-hover:rotate-[30deg]" style={{ filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.7))" }}>
             <defs>
-              <radialGradient id="gnb-rec" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#1c1c1c"/>
-                <stop offset="100%" stopColor="#070707"/>
+              {/* Record body: deep black with subtle warm highlight */}
+              <radialGradient id="gnb-body" cx="34%" cy="28%" r="72%">
+                <stop offset="0%" stopColor="#252520"/>
+                <stop offset="40%" stopColor="#0e0e0c"/>
+                <stop offset="100%" stopColor="#050504"/>
               </radialGradient>
-              <radialGradient id="gnb-lbl" cx="32%" cy="32%" r="68%">
-                <stop offset="0%" stopColor="#A56BFF"/>
-                <stop offset="100%" stopColor="#6D28D9"/>
+              {/* Warm amber label — vintage feel */}
+              <radialGradient id="gnb-label" cx="35%" cy="28%" r="70%">
+                <stop offset="0%" stopColor="#d4894a"/>
+                <stop offset="55%" stopColor="#8b4513"/>
+                <stop offset="100%" stopColor="#4a1f05"/>
               </radialGradient>
-              <radialGradient id="gnb-shn" cx="28%" cy="28%" r="55%">
-                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.18"/>
+              {/* Label sheen */}
+              <radialGradient id="gnb-lsheen" cx="30%" cy="22%" r="60%">
+                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.28"/>
+                <stop offset="100%" stopColor="#ffffff" stopOpacity="0"/>
+              </radialGradient>
+              {/* Top-left specular highlight on record */}
+              <radialGradient id="gnb-shine" cx="28%" cy="18%" r="50%">
+                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.10"/>
                 <stop offset="100%" stopColor="#ffffff" stopOpacity="0"/>
               </radialGradient>
             </defs>
+
             {/* Record body */}
-            <circle cx="20" cy="20" r="19.5" fill="url(#gnb-rec)" stroke="#2a2a2a" strokeWidth="0.5"/>
-            {/* Groove rings */}
-            <circle cx="20" cy="20" r="17.5" fill="none" stroke="#222" strokeWidth="0.6"/>
-            <circle cx="20" cy="20" r="15.5" fill="none" stroke="#1e1e1e" strokeWidth="0.6"/>
-            <circle cx="20" cy="20" r="13.5" fill="none" stroke="#222" strokeWidth="0.6"/>
-            <circle cx="20" cy="20" r="11.5" fill="none" stroke="#1e1e1e" strokeWidth="0.6"/>
-            <circle cx="20" cy="20" r="9.5" fill="none" stroke="#222" strokeWidth="0.6"/>
-            {/* Purple label */}
-            <circle cx="20" cy="20" r="7.8" fill="url(#gnb-lbl)"/>
-            <circle cx="20" cy="20" r="7.8" fill="url(#gnb-shn)"/>
-            {/* Center hole */}
-            <circle cx="20" cy="20" r="1.8" fill="#060606"/>
+            <circle cx="22" cy="22" r="21" fill="url(#gnb-body)"/>
+            {/* Outer rim */}
+            <circle cx="22" cy="22" r="21" fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="0.5"/>
+
+            {/* Groove rings — fine, many */}
+            <circle cx="22" cy="22" r="19.5" fill="none" stroke="rgba(255,255,255,0.055)" strokeWidth="0.5"/>
+            <circle cx="22" cy="22" r="18.5" fill="none" stroke="rgba(255,255,255,0.040)" strokeWidth="0.4"/>
+            <circle cx="22" cy="22" r="17.4" fill="none" stroke="rgba(255,255,255,0.055)" strokeWidth="0.5"/>
+            <circle cx="22" cy="22" r="16.3" fill="none" stroke="rgba(255,255,255,0.040)" strokeWidth="0.4"/>
+            <circle cx="22" cy="22" r="15.2" fill="none" stroke="rgba(255,255,255,0.055)" strokeWidth="0.5"/>
+            <circle cx="22" cy="22" r="14.1" fill="none" stroke="rgba(255,255,255,0.040)" strokeWidth="0.4"/>
+            <circle cx="22" cy="22" r="13.0" fill="none" stroke="rgba(255,255,255,0.055)" strokeWidth="0.5"/>
+            <circle cx="22" cy="22" r="11.9" fill="none" stroke="rgba(255,255,255,0.040)" strokeWidth="0.4"/>
+            <circle cx="22" cy="22" r="10.8" fill="none" stroke="rgba(255,255,255,0.055)" strokeWidth="0.5"/>
+
+            {/* Inner lead-out groove separator */}
+            <circle cx="22" cy="22" r="9.6" fill="none" stroke="rgba(255,255,255,0.09)" strokeWidth="0.7"/>
+
+            {/* Center label */}
+            <circle cx="22" cy="22" r="7.8" fill="url(#gnb-label)"/>
+            <circle cx="22" cy="22" r="7.8" fill="url(#gnb-lsheen)"/>
+            {/* Label rim */}
+            <circle cx="22" cy="22" r="7.8" fill="none" stroke="rgba(255,200,100,0.20)" strokeWidth="0.4"/>
+
+            {/* MV monogram */}
+            <text
+              x="22" y="24.2"
+              textAnchor="middle"
+              fontSize="5.2"
+              fontWeight="800"
+              fontFamily="system-ui, -apple-system, sans-serif"
+              letterSpacing="0.5"
+              fill="rgba(255,248,220,0.88)"
+            >MV</text>
+
+            {/* Spindle hole */}
+            <circle cx="22" cy="22" r="1.7" fill="#060503"/>
+
+            {/* Specular highlight */}
+            <circle cx="22" cy="22" r="21" fill="url(#gnb-shine)"/>
           </svg>
-          <div className="flex items-baseline gap-0.5">
-            <span className="text-white/40 text-sm font-medium tracking-wide">My</span>
-            <span className="text-white text-lg font-bold tracking-tight">Vinyl</span>
+
+          {/* Wordmark */}
+          <div className="flex items-baseline gap-px">
+            <span className="text-white/38 text-[11px] font-semibold tracking-[0.18em] uppercase leading-none">my</span>
+            <span className="text-white text-[18px] font-extrabold tracking-[-0.03em] leading-none">Vinyl</span>
           </div>
         </Link>
 

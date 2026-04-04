@@ -1,41 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import AuthModal from "@/components/AuthModal";
 import type { LP } from "@/lib/types";
 
-function getCardVinylBg(lp: LP): string {
-  const c = lp.coverColor;
-  const groove = `repeating-radial-gradient(circle at center, #0e0e0e 0px, #0e0e0e 1px, #1c1c1c 1px, #1c1c1c 1.8px, #0f0f0f 1.8px, #0f0f0f 3px, #1a1a1a 3px, #1a1a1a 3.8px, #0d0d0d 3.8px, #0d0d0d 5px)`;
-  switch (lp.vinylStyle) {
-    case "splatter":
-      return [
-        `radial-gradient(circle 28px at 25% 30%, ${c}bb, transparent 65%)`,
-        `radial-gradient(circle 18px at 68% 20%, ${c}99, transparent 70%)`,
-        `radial-gradient(circle 36px at 72% 70%, ${c}88, transparent 60%)`,
-        `radial-gradient(circle 14px at 40% 78%, ${c}cc, transparent 60%)`,
-        `radial-gradient(circle 22px at 85% 45%, ${c}77, transparent 65%)`,
-        groove,
-      ].join(",");
-    case "marble":
-      return [
-        `conic-gradient(from 35deg at 40% 50%, ${c}30 0%, transparent 25%, ${c}20 48%, transparent 68%, ${c}28 88%, transparent 100%)`,
-        `radial-gradient(ellipse 65% 45% at 40% 55%, ${c}55, transparent 70%)`,
-        `repeating-radial-gradient(circle at center, #1a0808 0px, #1a0808 1px, #2a1212 1px, #2a1212 1.8px, #1c0a0a 1.8px, #1c0a0a 3px, #260e0e 3px, #260e0e 3.8px, #1a0808 3.8px, #1a0808 5px)`,
-      ].join(",");
-    case "color":
-      return `repeating-radial-gradient(circle at center, ${c}99 0px, ${c}99 1px, ${c}cc 1px, ${c}cc 1.8px, ${c}88 1.8px, ${c}88 3px, ${c}bb 3px, ${c}bb 3.8px, ${c}77 3.8px, ${c}77 5px)`;
-    default:
-      return groove;
-  }
-}
-
 export default function LPCard({ lp }: { lp: LP }) {
   const { status } = useSession();
   const [liked, setLiked] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  // LP 에디터에서 저장한 바이닐 색상 읽기
+  const [vinylColor, setVinylColor] = useState(lp.coverColor);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(`lp-custom-${lp.id}`);
+      if (stored) {
+        const config = JSON.parse(stored);
+        if (config.color) setVinylColor(config.color);
+      }
+    } catch {
+      // localStorage 접근 불가 시 무시
+    }
+  }, [lp.id]);
 
   function handleLike(e: React.MouseEvent) {
     e.preventDefault();
@@ -47,65 +35,123 @@ export default function LPCard({ lp }: { lp: LP }) {
     setLiked((v) => !v);
   }
 
+
   return (
     <>
-      <div className="bg-white rounded-xl border border-lp-border overflow-hidden hover:shadow-md transition-shadow group">
-        {/* Cover */}
-        <Link href={`/lp/${lp.id}`} className="block aspect-square relative overflow-hidden">
+      <div className="group">
+        {/* ── 슬리브 + 바이닐 레이아웃 (3:2 비율) ── */}
+        {/*
+          컨테이너 3:2 → width=3u height=2u
+          슬리브: left=0, width=66.67% (=2u) → 정사각형 ✓
+          바이닐: right=0, width=66.67% (=2u) → 원형 ✓, 1u(33%)가 슬리브 뒤에 숨김
+        */}
+        <div className="relative mb-3" style={{ aspectRatio: "3/2" }}>
+
+          {/* ── 바이닐 레코드 (슬리브 뒤, 오른쪽 절반만 노출) ── */}
           <div
-            className="w-full h-full flex items-center justify-center relative overflow-hidden"
-            style={{ backgroundColor: lp.coverColor }}
+            className="absolute top-0 right-0 bottom-0 transition-transform duration-300 ease-out group-hover:translate-x-2"
+            style={{
+              width: "66.67%",
+              filter: "drop-shadow(-8px 0 18px rgba(0,0,0,0.55)) drop-shadow(-2px 0 6px rgba(0,0,0,0.4))",
+            }}
           >
-            {/* Album cover image background */}
-            {lp.coverUrl && (
+            <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                {/* 레코드 본체 그라디언트 — 커스텀 바이닐 색상 */}
+                <radialGradient id={`vb-${lp.id}`} cx="38%" cy="32%" r="72%">
+                  <stop offset="0%" stopColor={vinylColor}/>
+                  <stop offset="60%" stopColor={vinylColor}/>
+                  <stop offset="100%" stopColor={vinylColor + "cc"}/>
+                </radialGradient>
+                {/* 크림색 센터 라벨 */}
+                <radialGradient id={`vl-${lp.id}`} cx="36%" cy="28%" r="68%">
+                  <stop offset="0%" stopColor="#faf6ec"/>
+                  <stop offset="60%" stopColor="#ede5cc"/>
+                  <stop offset="100%" stopColor="#ddd0b0"/>
+                </radialGradient>
+                {/* 레코드 표면 반사광 */}
+                <radialGradient id={`vs-${lp.id}`} cx="28%" cy="20%" r="52%">
+                  <stop offset="0%" stopColor="rgba(255,255,255,0.22)"/>
+                  <stop offset="100%" stopColor="rgba(255,255,255,0)"/>
+                </radialGradient>
+              </defs>
+
+              {/* 레코드 본체 */}
+              <circle cx="50" cy="50" r="49.5" fill={`url(#vb-${lp.id})`}/>
+              {/* 외곽 테두리 */}
+              <circle cx="50" cy="50" r="49.5" fill="none" stroke="rgba(0,0,0,0.25)" strokeWidth="0.6"/>
+
+              {/* 그루브 링 — 컬러 바이닐 위에 어두운 링 */}
+              {[45, 41.5, 38, 34.5, 31, 27.5, 24, 20.5, 17].map((r) => (
+                <circle
+                  key={r}
+                  cx="50" cy="50" r={r}
+                  fill="none"
+                  stroke="rgba(0,0,0,0.18)"
+                  strokeWidth="0.55"
+                />
+              ))}
+
+              {/* 리드아웃 구분선 */}
+              <circle cx="50" cy="50" r="14.5" fill="none" stroke="rgba(0,0,0,0.22)" strokeWidth="0.9"/>
+
+              {/* 센터 라벨 */}
+              <circle cx="50" cy="50" r="13" fill={`url(#vl-${lp.id})`}/>
+              {/* 라벨 동심원 */}
+              <circle cx="50" cy="50" r="13" fill="none" stroke="rgba(0,0,0,0.12)" strokeWidth="0.4"/>
+              <circle cx="50" cy="50" r="10.5" fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="0.35"/>
+              <circle cx="50" cy="50" r="8" fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="0.35"/>
+
+              {/* 스핀들 홀 */}
+              <circle cx="50" cy="50" r="3.2" fill="#080808"/>
+              <circle cx="50" cy="50" r="2.4" fill="#030303"/>
+
+              {/* 반사광 오버레이 */}
+              <circle cx="50" cy="50" r="49.5" fill={`url(#vs-${lp.id})`}/>
+            </svg>
+          </div>
+
+          {/* ── 앨범 슬리브 (겉표지) ── */}
+          <div
+            className="absolute inset-y-0 left-0 z-10 overflow-hidden rounded-lg transition-transform duration-300 ease-out group-hover:-translate-x-1"
+            style={{
+              width: "66.67%",
+              boxShadow: "4px 0 24px rgba(0,0,0,0.35), 0 4px 16px rgba(0,0,0,0.25)",
+            }}
+          >
+            {lp.coverUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={lp.coverUrl}
                 alt={lp.title}
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ opacity: 0.85 }}
+                className="w-full h-full object-cover"
               />
+            ) : (
+              <div className="w-full h-full" style={{ backgroundColor: lp.coverColor }}/>
             )}
-            {/* LP disc illust */}
-            <div className="w-28 h-28 rounded-full relative shadow-2xl z-10" style={{ border: "3px solid rgba(255,255,255,0.15)" }}>
-              {/* Vinyl surface */}
-              <div
-                className="absolute inset-0 rounded-full"
-                style={{ background: getCardVinylBg(lp) }}
-              />
-              {/* Label area — show cover image if available */}
-              <div
-                className="absolute rounded-full z-10 overflow-hidden"
-                style={{
-                  width: "36%", height: "36%",
-                  top: "32%", left: "32%",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
-                }}
-              >
-                {lp.coverUrl ? (
-                  <img src={lp.coverUrl} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full" style={{ background: `radial-gradient(circle at 35% 30%, ${lp.coverColor}ff, ${lp.coverColor}99)` }} />
-                )}
-              </div>
-              {/* Spindle hole */}
-              <div className="absolute rounded-full z-20 bg-black/60" style={{ width: "8%", height: "8%", top: "46%", left: "46%" }} />
-            </div>
+
+            {/* 슬리브 오른쪽 개구부 그림자 (레코드가 나오는 방향) */}
+            <div
+              className="absolute inset-y-0 right-0 w-12 pointer-events-none"
+              style={{ background: "linear-gradient(to left, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0.10) 60%, transparent 100%)" }}
+            />
           </div>
 
-          {/* 찜 button — 항상 표시, 로그인 여부는 클릭 시 확인 */}
+          {/* ── 찜 버튼 ── */}
           <button
             onClick={handleLike}
-            className="absolute top-2.5 right-2.5 z-20 w-8 h-8 flex items-center justify-center rounded-full transition-all"
+            className="absolute top-2 left-2 z-20 w-7 h-7 flex items-center justify-center rounded-full transition-all duration-200"
             style={{
-              background: liked ? "rgba(239,68,68,0.15)" : "rgba(0,0,0,0.35)",
-              backdropFilter: "blur(4px)",
+              background: liked ? "rgba(239,68,68,0.18)" : "rgba(0,0,0,0.42)",
+              backdropFilter: "blur(6px)",
+              WebkitBackdropFilter: "blur(6px)",
             }}
             aria-label={liked ? "찜 취소" : "찜하기"}
           >
             <svg
-              className="w-4 h-4 transition-colors"
+              className="w-3.5 h-3.5 transition-colors"
               fill={liked ? "#ef4444" : "none"}
-              stroke={liked ? "#ef4444" : "rgba(255,255,255,0.8)"}
+              stroke={liked ? "#ef4444" : "rgba(255,255,255,0.9)"}
               strokeWidth={2}
               viewBox="0 0 24 24"
             >
@@ -113,42 +159,38 @@ export default function LPCard({ lp }: { lp: LP }) {
             </svg>
           </button>
 
-          {/* Play button overlay */}
-          <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          {/* ── 재생 버튼 (바이닐 위, 호버 시 표시) ── */}
+          <div
+            className="absolute top-0 bottom-0 right-0 z-20 flex items-center justify-center"
+            style={{ width: "33.34%" }}
+          >
             <Link
               href={`/player/${lp.id}`}
-              className="w-14 h-14 rounded-full bg-lp-accent-btn flex items-center justify-center"
+              className="w-11 h-11 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 active:scale-95"
+              style={{
+                background: "rgba(0,0,0,0.55)",
+                backdropFilter: "blur(8px)",
+                WebkitBackdropFilter: "blur(8px)",
+                border: "1.5px solid rgba(255,255,255,0.22)",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
+              }}
               onClick={(e) => e.stopPropagation()}
             >
-              <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M8 5v14l11-7z" />
               </svg>
             </Link>
           </div>
-        </Link>
-
-        {/* Info */}
-        <div className="p-4">
-          <Link href={`/lp/${lp.id}`} className="block">
-            <h3 className="font-semibold text-lp-primary text-sm leading-tight truncate hover:text-lp-accent transition-colors">
-              {lp.title}
-            </h3>
-            <p className="text-lp-secondary text-xs mt-1 truncate">{lp.artist}</p>
-            <p className="text-lp-tertiary text-xs mt-0.5">
-              {lp.year} · {lp.genre}
-            </p>
-          </Link>
-
-          <Link
-            href={`/player/${lp.id}`}
-            className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2 bg-lp-accent-btn text-white text-xs font-medium rounded-lg hover:bg-lp-accent transition-colors"
-          >
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-            재생
-          </Link>
         </div>
+
+        {/* ── 정보 ── */}
+        <Link href={`/lp/${lp.id}`} className="block">
+          <h3 className="font-semibold text-lp-primary text-sm leading-tight truncate group-hover:text-lp-accent transition-colors">
+            {lp.title}
+          </h3>
+          <p className="text-lp-secondary text-xs mt-0.5 truncate">{lp.artist}</p>
+          <p className="text-lp-tertiary text-xs mt-0.5">{lp.year} · {lp.genre}</p>
+        </Link>
       </div>
 
       {showAuthModal && (

@@ -96,35 +96,187 @@ export default function ShopPage() {
             >
               {/* Preview area */}
               <div
-                className="relative h-44 flex items-center justify-center"
-                style={{ background: `radial-gradient(circle at 30% 30%, ${item.color}dd, ${item.color})` }}
+                className="relative h-48 flex items-center justify-center overflow-hidden"
+                style={{ background: `linear-gradient(145deg, ${item.color}cc 0%, ${item.color}55 50%, #0a0a0a 100%)` }}
               >
-                {/* Visual preview by category */}
+                {/* Turntable skin: top-down platter + tonearm */}
                 {item.category === "skin" && (
-                  <div className="relative w-28 h-28 rounded-full"
-                    style={{ background: `radial-gradient(135deg, ${item.color}44, ${item.color})`, boxShadow: "0 4px 20px rgba(0,0,0,0.4)" }}>
-                    <div className="absolute inset-0 rounded-full border-4 border-white/10" />
-                    <div className="absolute inset-6 rounded-full" style={{ background: `conic-gradient(${item.accent}44, #111 50%, ${item.accent}22)` }} />
-                    <div className="absolute w-5 h-5 rounded-full bg-black/40 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-                  </div>
+                  <svg viewBox="0 0 160 160" className="w-40 h-40" style={{ filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.7))" }}>
+                    <defs>
+                      <radialGradient id={`platter-${item.id}`} cx="40%" cy="36%" r="68%">
+                        <stop offset="0%" stopColor={item.color} stopOpacity="0.9"/>
+                        <stop offset="60%" stopColor={item.color} stopOpacity="0.55"/>
+                        <stop offset="100%" stopColor="#080808"/>
+                      </radialGradient>
+                      <radialGradient id={`mat-${item.id}`} cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stopColor={item.accent} stopOpacity="0.35"/>
+                        <stop offset="100%" stopColor={item.accent} stopOpacity="0.08"/>
+                      </radialGradient>
+                      <radialGradient id={`hub-${item.id}`} cx="38%" cy="32%" r="66%">
+                        <stop offset="0%" stopColor={item.accent}/>
+                        <stop offset="100%" stopColor={item.color}/>
+                      </radialGradient>
+                    </defs>
+                    {/* Platter body */}
+                    <circle cx="78" cy="82" r="68" fill="url(#platter-${item.id})"/>
+                    <circle cx="78" cy="82" r="68" fill={`url(#platter-${item.id})`}/>
+                    {/* Platter edge grip ridges */}
+                    <circle cx="78" cy="82" r="67" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="0.8"/>
+                    <circle cx="78" cy="82" r="65" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="0.5"/>
+                    <circle cx="78" cy="82" r="63" fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="0.5"/>
+                    {/* Rubber mat */}
+                    <circle cx="78" cy="82" r="60" fill={`url(#mat-${item.id})`}/>
+                    <circle cx="78" cy="82" r="60" fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="0.5"/>
+                    {/* Mat groove rings */}
+                    <circle cx="78" cy="82" r="52" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="0.7"/>
+                    <circle cx="78" cy="82" r="44" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="0.7"/>
+                    <circle cx="78" cy="82" r="36" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="0.7"/>
+                    {/* Center hub */}
+                    <circle cx="78" cy="82" r="14" fill={`url(#hub-${item.id})`}/>
+                    <circle cx="78" cy="82" r="14" fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="0.8"/>
+                    <circle cx="78" cy="82" r="5" fill="rgba(0,0,0,0.7)"/>
+                    <circle cx="78" cy="82" r="2.5" fill="#0a0a0a"/>
+                    {/* Tonearm base */}
+                    <circle cx="142" cy="26" r="9" fill="rgba(200,200,200,0.25)"/>
+                    <circle cx="142" cy="26" r="6" fill="rgba(255,255,255,0.15)"/>
+                    {/* Tonearm tube */}
+                    <line x1="142" y1="26" x2="90" y2="84" stroke="rgba(255,255,255,0.45)" strokeWidth="2.2" strokeLinecap="round"/>
+                    {/* Headshell */}
+                    <ellipse cx="88" cy="86" rx="7" ry="4" fill="rgba(255,255,255,0.3)" transform="rotate(-45 88 86)"/>
+                    {/* Stylus */}
+                    <line x1="91" y1="89" x2="94" y2="94" stroke={item.accent} strokeWidth="1.5" strokeLinecap="round"/>
+                    <circle cx="94" cy="94" r="2" fill={item.accent}/>
+                  </svg>
                 )}
+
+                {/* LP design: detailed vinyl record */}
                 {item.category === "lp" && (
-                  <div className="relative w-24 h-24 rounded-full"
-                    style={{ background: `conic-gradient(${item.color}, #111 30%, ${item.color}88 60%, #000 80%, ${item.color})`, boxShadow: "0 4px 20px rgba(0,0,0,0.5)" }}>
-                    <div className="absolute inset-0 rounded-full" style={{ background: "repeating-radial-gradient(circle, transparent, transparent 3px, rgba(255,255,255,0.03) 3px, rgba(255,255,255,0.03) 4px)" }} />
-                    <div className="absolute w-8 h-8 rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{ backgroundColor: item.accent }} />
-                  </div>
-                )}
-                {item.category === "background" && (
-                  <div className="text-4xl">🎵</div>
-                )}
-                {item.category === "sticker" && (
-                  <div className="flex flex-wrap gap-2 justify-center px-4">
-                    {["🎵", "⭐", "🎸", "🌙", "✨"].map((s) => (
-                      <span key={s} className="text-2xl">{s}</span>
+                  <svg viewBox="0 0 160 160" className="w-40 h-40" style={{ filter: "drop-shadow(0 10px 28px rgba(0,0,0,0.75))" }}>
+                    <defs>
+                      <radialGradient id={`rec-${item.id}`} cx="36%" cy="30%" r="75%">
+                        <stop offset="0%" stopColor={item.color} stopOpacity="0.65"/>
+                        <stop offset="45%" stopColor="#0d0d0d"/>
+                        <stop offset="100%" stopColor="#040404"/>
+                      </radialGradient>
+                      <radialGradient id={`lbl-${item.id}`} cx="36%" cy="30%" r="72%">
+                        <stop offset="0%" stopColor={item.accent} stopOpacity="0.95"/>
+                        <stop offset="65%" stopColor={item.accent} stopOpacity="0.7"/>
+                        <stop offset="100%" stopColor={item.color} stopOpacity="0.5"/>
+                      </radialGradient>
+                      <radialGradient id={`gloss-${item.id}`} cx="28%" cy="22%" r="55%">
+                        <stop offset="0%" stopColor="rgba(255,255,255,0.13)"/>
+                        <stop offset="100%" stopColor="rgba(255,255,255,0)"/>
+                      </radialGradient>
+                    </defs>
+                    {/* Record body */}
+                    <circle cx="80" cy="80" r="75" fill={`url(#rec-${item.id})`}/>
+                    <circle cx="80" cy="80" r="75" fill="none" stroke="rgba(255,255,255,0.09)" strokeWidth="0.6"/>
+                    {/* Groove rings */}
+                    {[70,65,60,55,50,45,40,35,30].map((r) => (
+                      <circle key={r} cx="80" cy="80" r={r} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="0.7"/>
                     ))}
-                  </div>
+                    {/* Lead-out groove */}
+                    <circle cx="80" cy="80" r="26" fill="none" stroke="rgba(255,255,255,0.11)" strokeWidth="0.9"/>
+                    {/* Center label */}
+                    <circle cx="80" cy="80" r="22" fill={`url(#lbl-${item.id})`}/>
+                    <circle cx="80" cy="80" r="22" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="0.6"/>
+                    {/* Spindle hole */}
+                    <circle cx="80" cy="80" r="5" fill="#050505"/>
+                    <circle cx="80" cy="80" r="3.5" fill="#020202"/>
+                    {/* Gloss overlay */}
+                    <circle cx="80" cy="80" r="75" fill={`url(#gloss-${item.id})`}/>
+                  </svg>
                 )}
+
+                {/* Background: atmospheric scene */}
+                {item.category === "background" && (
+                  <svg viewBox="0 0 200 140" className="w-full h-full absolute inset-0" preserveAspectRatio="xMidYMid slice">
+                    <defs>
+                      <linearGradient id={`sky-${item.id}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={item.color}/>
+                        <stop offset="100%" stopColor={item.accent} stopOpacity="0.5"/>
+                      </linearGradient>
+                    </defs>
+                    <rect width="200" height="140" fill={`url(#sky-${item.id})`}/>
+                    {/* Scene variants */}
+                    {item.id === "b1" && <>
+                      {/* Jazz bar — warm lamplight circles + bar silhouette */}
+                      <ellipse cx="100" cy="40" rx="30" ry="20" fill="rgba(252,211,77,0.15)"/>
+                      <ellipse cx="50" cy="55" rx="18" ry="12" fill="rgba(252,211,77,0.10)"/>
+                      <ellipse cx="155" cy="50" rx="18" ry="12" fill="rgba(252,211,77,0.10)"/>
+                      <rect x="0" y="95" width="200" height="45" fill="rgba(0,0,0,0.6)"/>
+                      <rect x="20" y="70" width="12" height="25" rx="1" fill="rgba(0,0,0,0.75)"/>
+                      <rect x="80" y="60" width="10" height="35" rx="1" fill="rgba(0,0,0,0.75)"/>
+                      <rect x="140" y="65" width="14" height="30" rx="1" fill="rgba(0,0,0,0.75)"/>
+                      <circle cx="100" cy="35" r="4" fill="rgba(252,211,77,0.5)"/>
+                      <circle cx="50" cy="50" r="2.5" fill="rgba(252,211,77,0.4)"/>
+                      <circle cx="155" cy="45" r="2.5" fill="rgba(252,211,77,0.4)"/>
+                    </>}
+                    {item.id === "b2" && <>
+                      {/* Record store — shelves */}
+                      <rect x="0" y="85" width="200" height="55" fill="rgba(0,0,0,0.5)"/>
+                      {[15,35,55,75,95,115,135,155,175].map((x) => (
+                        <rect key={x} x={x} y={60} width={14} height={25} rx="1" fill={`rgba(${Math.floor(Math.random()*100)+80},${Math.floor(Math.random()*60)+20},${Math.floor(Math.random()*80)+40},0.7)`}/>
+                      ))}
+                      <rect x="0" y="85" width="200" height="4" fill="rgba(255,255,255,0.07)"/>
+                      <rect x="0" y="105" width="200" height="3" fill="rgba(255,255,255,0.05)"/>
+                      {[15,35,55,75,95,115,135,155,175].map((x, i) => (
+                        <rect key={x+200} x={x} y={107} width={14} height={18} rx="1" fill={`rgba(${60+i*18},${40+i*8},${120-i*10},0.65)`}/>
+                      ))}
+                    </>}
+                    {item.id === "b3" && <>
+                      {/* Sunset rooftop */}
+                      <ellipse cx="100" cy="80" rx="90" ry="40" fill="rgba(251,146,60,0.25)"/>
+                      <rect x="0" y="95" width="200" height="45" fill="rgba(0,0,0,0.65)"/>
+                      <rect x="10" y="50" width="22" height="45" rx="1" fill="rgba(0,0,0,0.7)"/>
+                      <rect x="55" y="35" width="30" height="60" rx="1" fill="rgba(0,0,0,0.7)"/>
+                      <rect x="110" y="45" width="18" height="50" rx="1" fill="rgba(0,0,0,0.7)"/>
+                      <rect x="148" y="30" width="25" height="65" rx="1" fill="rgba(0,0,0,0.7)"/>
+                      <rect x="25" y="60" width="6" height="3" fill="rgba(252,165,165,0.3)"/>
+                      <rect x="70" y="52" width="6" height="3" fill="rgba(252,165,165,0.3)"/>
+                    </>}
+                    {item.id === "b4" && <>
+                      {/* Space — stars */}
+                      {[
+                        [20,15],[45,8],[80,22],[120,10],[160,18],[190,5],
+                        [10,40],[35,55],[65,35],[100,48],[140,38],[175,50],
+                        [25,70],[55,80],[90,65],[130,75],[170,68],[195,80],
+                        [15,95],[50,100],[85,90],[115,105],[155,92],[185,100],
+                      ].map(([x,y], i) => (
+                        <circle key={i} cx={x} cy={y} r={i%3===0?1.2:0.7} fill="rgba(255,255,255,0.75)"/>
+                      ))}
+                      <ellipse cx="100" cy="110" rx="55" ry="22" fill="rgba(167,139,250,0.18)" style={{filter:"blur(6px)"}}/>
+                      <ellipse cx="100" cy="112" rx="35" ry="14" fill="rgba(167,139,250,0.14)"/>
+                    </>}
+                  </svg>
+                )}
+
+                {/* Sticker pack: styled card grid */}
+                {item.category === "sticker" && (() => {
+                  const packs: Record<string, Array<{e:string;r:number}>> = {
+                    st1: [{e:"🎸",r:-8},{e:"📼",r:5},{e:"🎵",r:-4},{e:"🎶",r:7},{e:"🎹",r:-6},{e:"📻",r:3}],
+                    st2: [{e:"🎤",r:-5},{e:"🎧",r:8},{e:"🥁",r:-7},{e:"🎺",r:4},{e:"🎻",r:-9},{e:"🪗",r:6}],
+                    st3: [{e:"⭐",r:-4},{e:"💜",r:7},{e:"🌸",r:-8},{e:"✨",r:5},{e:"🌟",r:-3},{e:"💫",r:9}],
+                    st4: [{e:"🎼",r:-6},{e:"🎹",r:4},{e:"🎵",r:-9},{e:"🎶",r:7},{e:"🎷",r:-4},{e:"🎻",r:5}],
+                  };
+                  const stickers = packs[item.id] ?? packs.st1;
+                  return (
+                    <div className="grid grid-cols-3 gap-2.5 p-2">
+                      {stickers.map(({e, r}, i) => (
+                        <div
+                          key={i}
+                          className="w-11 h-11 bg-white rounded-2xl flex items-center justify-center text-2xl"
+                          style={{
+                            transform: `rotate(${r}deg)`,
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.3)",
+                          }}
+                        >
+                          {e}
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
 
                 {/* Badges */}
                 <div className="absolute top-2 left-2 flex flex-col gap-1">

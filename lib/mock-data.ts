@@ -359,7 +359,17 @@ export const MOCK_USER: User = {
   collectionCount: 6,
 };
 
-export const GENRES = ["전체", "Indie Rock", "Indie Pop", "Alt Rock", "Folk", "Jazz", "Electronic", "Hip-Hop", "Classical"];
+export const GENRES = [
+  "전체", 
+  "인디", 
+  "인디 팝", 
+  "얼터너티브 록", 
+  "포크", 
+  "재즈", 
+  "일렉트로닉", 
+  "힙합", 
+  "클래식"
+];
 
 export function getLPById(id: string): LP | undefined {
   return MOCK_LPS.find((lp) => lp.id === id);
