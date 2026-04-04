@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import LPCard from "@/components/lp/LPCard";
 import Chip from "@/components/ui/Chip";
 import { MOCK_LPS, GENRES } from "@/lib/mock-data";
 
 export default function BrowsePage() {
+  const { status } = useSession();
+  const isAuthenticated = status === "authenticated";
   const [selectedGenre, setSelectedGenre] = useState("전체");
   const [query, setQuery] = useState("");
 
@@ -80,8 +83,8 @@ export default function BrowsePage() {
       {/* LP Grid */}
       {filtered.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-          {filtered.map((lp) => (
-            <LPCard key={lp.id} lp={lp} />
+          {filtered.map((lp, i) => (
+            <LPCard key={lp.id} lp={lp} isAuthenticated={isAuthenticated} priority={i < 8} />
           ))}
         </div>
       ) : (

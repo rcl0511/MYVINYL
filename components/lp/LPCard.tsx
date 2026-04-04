@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 import AuthModal from "@/components/AuthModal";
 import type { LP } from "@/lib/types";
 
-export default function LPCard({ lp }: { lp: LP }) {
-  const { status } = useSession();
+export default function LPCard({ lp, isAuthenticated, priority }: { lp: LP; isAuthenticated?: boolean; priority?: boolean }) {
   const [liked, setLiked] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   // LP 에디터에서 저장한 바이닐 색상 읽기
@@ -28,7 +27,7 @@ export default function LPCard({ lp }: { lp: LP }) {
   function handleLike(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    if (status !== "authenticated") {
+    if (!isAuthenticated) {
       setShowAuthModal(true);
       return;
     }
@@ -120,11 +119,13 @@ export default function LPCard({ lp }: { lp: LP }) {
             }}
           >
             {lp.coverUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={lp.coverUrl}
                 alt={lp.title}
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 640px) 33vw, (max-width: 768px) 22vw, 15vw"
+                className="object-cover"
+                priority={priority}
               />
             ) : (
               <div className="w-full h-full" style={{ backgroundColor: lp.coverColor }}/>
