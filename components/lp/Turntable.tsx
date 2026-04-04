@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import type { LP, PlayerState, LPSide } from "@/lib/types";
+import { SPLATTER_STROKES } from "@/lib/splatter-vinyl";
 
 const RPM = 33.33;
 const DEG_PER_MS = (RPM * 360) / 60000;
@@ -29,26 +30,26 @@ export default function Turntable({
 
   const isPlaying = state === "playing";
 
-  /* ─── scale util: designed at size=520 ─── */
+  /* ─── scale util ─── */
   const px = (n: number) => Math.round((n / 520) * size);
 
-  /* ── Plinth dimensions ── */
+  /* ── Dimensions ── */
   const W  = size;
-  const H  = Math.round(size * 0.80);
-  const platD = px(365);         // platter outer diameter
-  const platX = px(32);          // platter left edge
-  const platY = px(32);          // platter top
-  const discD = px(335);         // vinyl disc
+  const H  = Math.round(size * 0.82); // 높이 살짝 증가
+  const platD = px(370); // 플래터 살짝 키움
+  const platX = px(30);
+  const platY = px(35);
+  const discD = px(340); // LP 살짝 키움
   const discX = platX + px(15);
   const discY = platY + px(15);
-  const labelD = px(108);
-  const armW   = px(190);
-  const armH   = px(270);
-  const pivX   = px(14);
-  const pivY   = px(14);
-  const tonearmDeg = isPlaying ? -4 + progress * 0.10 : 30;
+  const armW   = px(195);
+  const armH   = px(280);
+  const pivX   = px(15);
+  const pivY   = px(15);
+  // 재생 중일 때 톤암이 안쪽으로 더 들어가도록 수정
+  const tonearmDeg = isPlaying ? -5 + progress * 0.12 : 32;
 
-  /* ── RAF physics spin ── */
+  /* ── Physics Spin (유지) ── */
   useEffect(() => {
     function tick(ts: number) {
       if (lastRef.current === null) lastRef.current = ts;
@@ -56,8 +57,7 @@ export default function Turntable({
       lastRef.current = ts;
 
       const target = stateRef.current === "playing" ? DEG_PER_MS : 0;
-      speedRef.current =
-        target + (speedRef.current - target) * Math.exp(-dt / SPIN_TC);
+      speedRef.current = target + (speedRef.current - target) * Math.exp(-dt / SPIN_TC);
 
       if (speedRef.current > 0.0003) {
         angleRef.current = (angleRef.current + speedRef.current * dt) % 360;
@@ -73,7 +73,6 @@ export default function Turntable({
     };
   }, []);
 
-  /* ── Click-to-seek on vinyl surface ── */
   const handleDisc = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (!onSeek) return;
@@ -83,7 +82,7 @@ export default function Turntable({
       const cy = r.top  + r.height / 2;
       const dist = Math.sqrt((e.clientX - cx) ** 2 + (e.clientY - cy) ** 2);
       const maxR  = r.width / 2;
-      const inner = maxR * 0.17; // inside label
+      const inner = maxR * 0.17;
       const outer = maxR * 0.96;
       if (dist > inner && dist < outer) {
         const pct = 1 - (dist - inner) / (outer - inner);
@@ -94,378 +93,256 @@ export default function Turntable({
   );
 
   const c = lp.coverColor;
-
-  /* ── Vinyl surface layers based on vinylStyle ── */
-  const stdGroove = `repeating-radial-gradient(circle at center, #0d0d0d 0px, #0d0d0d 1.1px, #191919 1.1px, #191919 2px, #0e0e0e 2px, #0e0e0e 3.2px, #181818 3.2px, #181818 4px, #0c0c0c 4px, #0c0c0c 5.5px)`;
-  const sheen    = `conic-gradient(from 0deg, transparent 0%, rgba(255,255,255,0.055) 9%, rgba(255,255,255,0.01) 16%, transparent 25%, transparent 54%, rgba(255,255,255,0.035) 62%, transparent 70%, transparent 100%)`;
-
-  const vinylSurface = (() => {
-    switch (lp.vinylStyle) {
-      case "splatter": {
-        // Team Baby: hand-splattered pink/magenta on dark base
-        const spots = [
-          `radial-gradient(circle ${px(38)}px at 22% 28%, ${c}bb, transparent 65%)`,
-          `radial-gradient(circle ${px(20)}px at 68% 17%, ${c}99, transparent 70%)`,
-          `radial-gradient(circle ${px(48)}px at 74% 70%, ${c}88, transparent 60%)`,
-          `radial-gradient(circle ${px(16)}px at 38% 80%, ${c}cc, transparent 60%)`,
-          `radial-gradient(circle ${px(30)}px at 88% 44%, ${c}77, transparent 65%)`,
-          `radial-gradient(circle ${px(12)}px at 52% 55%, ${c}ee, transparent 60%)`,
-          `radial-gradient(circle ${px(26)}px at 14% 65%, ${c}66, transparent 65%)`,
-          `radial-gradient(circle ${px(10)}px at 45% 10%, ${c}dd, transparent 60%)`,
-        ].join(",");
-        return `${sheen}, ${spots}, ${stdGroove}`;
-      }
-      case "marble": {
-        // Thirsty: smoke-transparent marble vinyl (dark crimson smoke)
-        const smoke = [
-          `conic-gradient(from 30deg at 38% 48%, ${c}28 0%, transparent 22%, ${c}18 42%, transparent 62%, ${c}22 82%, transparent 100%)`,
-          `radial-gradient(ellipse 70% 45% at 42% 58%, ${c}44, transparent 70%)`,
-          `radial-gradient(ellipse 45% 70% at 62% 28%, ${c}33, transparent 70%)`,
-          `radial-gradient(ellipse 30% 55% at 18% 75%, ${c}22, transparent 65%)`,
-        ].join(",");
-        const marbleGroove = `repeating-radial-gradient(circle at center, #1a0808 0px, #1a0808 1.1px, #2a1212 1.1px, #2a1212 2px, #1c0a0a 2px, #1c0a0a 3.2px, #261010 3.2px, #261010 4px, #1a0808 4px, #1a0808 5.5px)`;
-        return `${sheen}, ${smoke}, ${marbleGroove}`;
-      }
-      case "color": {
-        // Translucent solid colored vinyl
-        const colorGroove = `repeating-radial-gradient(circle at center, ${c}99 0px, ${c}99 1.1px, ${c}cc 1.1px, ${c}cc 2px, ${c}88 2px, ${c}88 3.2px, ${c}bb 3.2px, ${c}bb 4px, ${c}77 4px, ${c}77 5.5px)`;
-        return `${sheen}, ${colorGroove}`;
-      }
-      default:
-        // Standard black vinyl
-        return `${sheen}, ${stdGroove}`;
-    }
-  })();
+  const style = (lp.vinylStyle || "color").toLowerCase();
+  const isSplatter = style.includes("splatter");
+  const isRed = style.includes("red");
+  const isEmerald = style.includes("emerald");
+  const isMarble = style.includes("marble") || style.includes("smoke");
 
   return (
-    <div
-      className="relative flex items-center justify-center select-none"
-      style={{ width: W, height: H }}
-    >
-      {/* ── Ambient underside glow ── */}
+    <div className="relative flex items-center justify-center select-none" style={{ width: W, height: H }}>
+      
+      {/* [수정] Ambient underside glow - 더 넓고 부드럽게 */}
       <div
         className="absolute pointer-events-none"
         style={{
-          width: "100%", height: "40%",
-          bottom: -16, left: 0,
-          background: `radial-gradient(ellipse, ${c}${isPlaying ? "60" : "25"} 0%, transparent 70%)`,
-          filter: "blur(28px)",
-          transition: "background 1.5s ease",
+          width: "110%", height: "50%", bottom: px(-20), left: "-5%",
+          background: `radial-gradient(ellipse at center, ${c}${isPlaying ? "50" : "15"} 0%, transparent 75%)`,
+          filter: `blur(${px(40)}px)`, transition: "background 2s ease, opacity 2s ease",
+          opacity: isPlaying ? 1 : 0.7
         }}
       />
 
-      {/* ── Plinth cabinet ── */}
+      {/* [수정] Plinth cabinet - 다크 우드 + 알루미늄 베이스 */}
       <div
         className="relative overflow-hidden"
         style={{
-          width: W, height: H,
-          borderRadius: px(18),
-          background:
-            "linear-gradient(155deg, #2c1b0a 0%, #190e04 30%, #0a0500 60%, #1d1107 85%, #2e1b0a 100%)",
-          boxShadow: [
-            "0 60px 140px rgba(0,0,0,1)",
-            "0 0 0 1px rgba(255,255,255,0.035)",
-            "inset 0 1px 0 rgba(255,255,255,0.06)",
-            "inset 0 -2px 0 rgba(0,0,0,0.7)",
-          ].join(","),
+          width: W, height: H, borderRadius: px(12),
+          // 리얼한 우드 그레인 느낌의 그라데이션
+          background: `
+            linear-gradient(170deg, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0) 40%),
+            linear-gradient(155deg, #3d2610 0%, #2a190b 20%, #1a0f05 50%, #2a190b 80%, #3d2610 100%)
+          `,
+          boxShadow: `
+            0 ${px(50)}px ${px(120)}px rgba(0,0,0,0.85), 
+            0 0 0 1px rgba(255,255,255,0.03) inset,
+            0 ${px(-4)}px 0 rgba(0,0,0,0.5) inset
+          `,
         }}
       >
-        {/* Wood grain texture */}
-        <div
-          className="absolute inset-0 pointer-events-none"
+        {/* [추가] 하단 알루미늄 절삭 베이스 효과 */}
+        <div 
           style={{
-            borderRadius: px(18),
-            backgroundImage: [
-              "repeating-linear-gradient(3deg, transparent 0, transparent 5px, rgba(255,255,255,0.006) 5px, rgba(255,255,255,0.006) 6px, transparent 6px, transparent 14px)",
-              "repeating-linear-gradient(-1.5deg, transparent 0, transparent 9px, rgba(0,0,0,0.06) 9px, rgba(0,0,0,0.06) 11px)",
-            ].join(","),
+            position: 'absolute', bottom: 0, left: 0, width: '100%', height: px(25),
+            background: 'linear-gradient(180deg, #888 0%, #444 10%, #666 50%, #333 90%, #555 100%)',
+            borderTop: '1px solid rgba(255,255,255,0.1)'
           }}
         />
 
-        {/* Brushed chrome strip along top edge */}
-        <div
-          className="absolute top-0 left-0 right-0 pointer-events-none"
-          style={{
-            height: px(12),
-            borderRadius: `${px(18)}px ${px(18)}px 0 0`,
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.01) 100%)",
-          }}
-        />
-
-        {/* ── Platter housing (chrome bearing ring) ── */}
+        {/* [수정] Platter housing - 스트로보스코프 패턴 추가 */}
         <div
           className="absolute rounded-full"
           style={{
-            width: platD, height: platD,
-            top: platY, left: platX,
-            background: "radial-gradient(circle at 35% 30%, #545454, #111)",
-            boxShadow: [
-              `0 ${px(6)}px ${px(28)}px rgba(0,0,0,0.9)`,
-              "inset 0 2px 6px rgba(255,255,255,0.07)",
-              "inset 0 -2px 6px rgba(0,0,0,0.6)",
-            ].join(","),
-          }}
-        />
-
-        {/* ── Rubber felt mat ── */}
-        <div
-          className="absolute rounded-full"
-          style={{
-            width: platD - px(16), height: platD - px(16),
-            top: platY + px(8), left: platX + px(8),
-            background: "radial-gradient(circle at 38% 32%, #1e1e1e, #060606)",
-            boxShadow:
-              "inset 0 4px 16px rgba(0,0,0,0.95), inset 0 -1px 4px rgba(255,255,255,0.02)",
+            width: platD, height: platD, top: platY, left: platX,
+            // 금속 질감 강화
+            background: "radial-gradient(circle at 35% 30%, #666 0%, #222 60%, #444 80%, #111 100%)",
+            boxShadow: `0 ${px(8)}px ${px(35)}px rgba(0,0,0,0.9), inset 0 2px 8px rgba(255,255,255,0.1)`,
           }}
         >
-          {/* Mat center slug */}
-          <div
-            className="absolute rounded-full"
-            style={{
-              width: px(18), height: px(18),
-              top: "50%", left: "50%",
-              transform: "translate(-50%,-50%)",
-              background: "#030303",
-              boxShadow: "inset 0 1px 3px rgba(0,0,0,0.9)",
-            }}
-          />
+          {/* [추가] 플래터 측면 스트로보 점무늬 패턴 */}
+          <svg width="100%" height="100%" viewBox="0 0 100 100">
+            <defs>
+              <pattern id="strobe" x="0" y="0" width="1" height="1" patternUnits="userSpaceOnUse">
+                {Array.from({length: 60}).map((_, i) => (
+                  <circle key={i} cx={50 + 48 * Math.cos(i * 6 * Math.PI / 180)} cy={50 + 48 * Math.sin(i * 6 * Math.PI / 180)} r="0.6" fill="rgba(255,255,255,0.15)" />
+                ))}
+              </pattern>
+            </defs>
+            <circle cx="50" cy="50" r="49.5" fill="url(#strobe)" />
+          </svg>
         </div>
 
-        {/* ── LP Disc — RAF-rotated ── */}
+        {/* [수정] Rubber felt mat - 질감 깊게 */}
+        <div
+          className="absolute rounded-full"
+          style={{
+            width: platD - px(18), height: platD - px(18), top: platY + px(9), left: platX + px(9),
+            background: "radial-gradient(circle at 38% 32%, #222 0%, #090909 70%, #1a1a1a 90%, #000 100%)",
+            boxShadow: "inset 0 5px 20px rgba(0,0,0,0.98)",
+          }}
+        >
+          {/* 중앙 스핀들 포스트 */}
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: px(8), height: px(8), borderRadius: '50%', background: 'linear-gradient(135deg, #999, #333)', boxShadow: '0 2px 4px rgba(0,0,0,0.5)'}} />
+        </div>
+
+        {/* ── LP Disc (유지) ── */}
         <div
           ref={discRef}
           className={onSeek ? "cursor-crosshair" : ""}
-          style={{
-            position: "absolute",
-            width: discD, height: discD,
-            top: discY, left: discX,
-            borderRadius: "50%",
-          }}
+          style={{ position: "absolute", width: discD, height: discD, top: discY, left: discX, borderRadius: "50%", zIndex: 5 }}
           onClick={handleDisc}
         >
-          {/* Vinyl surface: groove rings + style-specific effect */}
-          <div
-            style={{
-              position: "absolute", inset: 0, borderRadius: "50%",
-              background: vinylSurface,
-              boxShadow: [
-                "0 0 0 1px rgba(255,255,255,0.02)",
-                "0 8px 32px rgba(0,0,0,0.75)",
-              ].join(","),
-            }}
-          />
+          <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", borderRadius: "50%", boxShadow: `0 ${px(10)}px ${px(40)}px rgba(0,0,0,0.8)` }} viewBox="0 0 100 100">
+            <defs>
+              <clipPath id={`vclip-${lp.id}`}>
+                <circle cx="50" cy="50" r="49.5"/>
+              </clipPath>
 
-          {/* Iridescent oil-slick highlight */}
-          <div
-            style={{
-              position: "absolute", inset: 0, borderRadius: "50%", pointerEvents: "none",
-              background:
-                "radial-gradient(ellipse 55% 28% at 28% 18%, rgba(160,120,255,0.07), transparent 60%)",
-            }}
-          />
+              {/* 그라데이션 정의 (Red, Emerald, Smoke, Shine 등...) */}
+              <radialGradient id={`redAcrylic-${lp.id}`} cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#9f1239" stopOpacity="0.7" />
+                <stop offset="100%" stopColor="#9f1239" stopOpacity="0.95" />
+              </radialGradient>
+              <radialGradient id={`emeraldAcrylic-${lp.id}`} cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#065f46" stopOpacity="0.7" />
+                <stop offset="100%" stopColor="#064e3b" stopOpacity="0.95" />
+              </radialGradient>
+              <radialGradient id={`smokeAcrylic-${lp.id}`} cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#404040" stopOpacity="0.4" />
+                <stop offset="100%" stopColor="#0a0a0a" stopOpacity="0.9" />
+              </radialGradient>
+              <linearGradient id={`acrylicShine-${lp.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="5%" stopColor="white" stopOpacity="0.6" />
+                <stop offset="20%" stopColor="white" stopOpacity="0" />
+                <stop offset="48%" stopColor="white" stopOpacity="0.2" />
+                <stop offset="52%" stopColor="white" stopOpacity="0" />
+                <stop offset="85%" stopColor="white" stopOpacity="0.45" />
+              </linearGradient>
+              <filter id={`marbleFilter-${lp.id}`}>
+                <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="5" seed={lp.year} />
+                <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 20 -10" />
+                <feGaussianBlur stdDeviation="2.5" />
+                <feDisplacementMap in="SourceGraphic" scale="45" />
+              </filter>
+              {/* TEAM BABY 스플래터 필터 */}
+              <filter id={`roughFilter-${lp.id}`}>
+                <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.2" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
+              {/* 크림색 센터 라벨 */}
+              <radialGradient id={`vl-${lp.id}`} cx="36%" cy="28%" r="68%">
+                <stop offset="0%" stopColor="#faf6ec"/>
+                <stop offset="60%" stopColor="#ede5cc"/>
+                <stop offset="100%" stopColor="#ddd0b0"/>
+              </radialGradient>
+            </defs>
 
-          {/* ── Center label ── */}
-          <div
-            style={{
-              position: "absolute",
-              width: labelD, height: labelD,
-              top: "50%", left: "50%",
-              transform: "translate(-50%,-50%)",
-              borderRadius: "50%",
-              background: lp.coverUrl ? "transparent" : `radial-gradient(circle at 30% 25%, ${c}ff, ${c}bb)`,
-              boxShadow: [
-                `0 0 0 ${px(2)}px ${c}55`,
-                `0 0 0 ${px(3)}px rgba(255,255,255,0.05)`,
-                `0 ${px(4)}px ${px(16)}px rgba(0,0,0,0.7)`,
-              ].join(","),
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              overflow: "hidden",
-            }}
-          >
-            {/* Real album cover image in label */}
-            {lp.coverUrl && (
-              <img
-                src={lp.coverUrl}
-                alt={lp.title}
-                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%", opacity: 0.88 }}
-                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-              />
+            {/* ── 스타일별 렌더링 ── */}
+            {isSplatter ? (
+              /* ── [TEAM BABY] 화이트 스플래터 (이전 버전) ── */
+              <g clipPath={`url(#vclip-${lp.id})`}>
+                <circle cx="50" cy="50" r="49.5" fill="#f8f7f4"/>
+                <g filter={`url(#roughFilter-${lp.id})`}>
+                  {SPLATTER_STROKES.map((s, i) => (
+                    <line key={i} x1="50" y1={50 - s.r2} x2="50" y2={50 - s.r1} stroke={s.c} strokeWidth={s.w * 1.8} strokeLinecap="round" opacity={s.o} transform={`rotate(${s.a}, 50, 50)`} />
+                  ))}
+                </g>
+                <circle cx="50" cy="50" r="13.2" fill={`url(#vl-${lp.id})`}/>
+                <text x="50" y="50" textAnchor="middle" fontSize="2.5" fontWeight="700" fill="#28190a">TEAM BABY</text>
+              </g>
+            ) : (isRed || isEmerald) ? (
+              /* ── [201 & TEEN TROUBLES] 딥 아크릴 + 글리터 강화 버전 ── */
+              <g clipPath={`url(#vclip-${lp.id})`}>
+                <circle cx="50" cy="50" r="49.5" fill={`url(#${isRed ? 'red' : 'emerald'}Acrylic-${lp.id})`} />
+                <g>
+                  {Array.from({ length: 600 }).map((_, i) => {
+                    const g = {
+                      cx: Math.random() * 100,
+                      cy: Math.random() * 100,
+                      r: 0.06 + Math.random() * 0.12,
+                      opacity: 0.7 + Math.random() * 0.3,
+                    };
+                    return <circle key={i} cx={g.cx} cy={g.cy} r={g.r} fill="#ffffff" opacity={g.opacity} />;
+                  })}
+                </g>
+                {[46, 42.5, 39, 35.5, 32, 28.5, 25, 21.5, 18].map((r) => (
+                  <circle key={r} cx="50" cy="50" r={r} fill="none" stroke="white" strokeWidth="0.08" opacity="0.1"/>
+                ))}
+                <circle cx="50" cy="50" r="49.5" fill={`url(#acrylicShine-${lp.id})`} />
+                <circle cx="50" cy="50" r="13.5" fill="white" />
+                {lp.coverUrl && <image href={lp.coverUrl} x="36.5" y="36.5" height="27" width="27" clipPath="circle(50%)" preserveAspectRatio="xMidYMid slice" />}
+              </g>
+            ) : isMarble ? (
+              /* ── [THIRSTY] 스모크 마블 (글리터 없음) ── */
+              <g clipPath={`url(#vclip-${lp.id})`}>
+                <circle cx="50" cy="50" r="49.5" fill={`url(#smokeAcrylic-${lp.id})`} />
+                <g filter={`url(#marbleFilter-${lp.id})`} opacity="0.8">
+                  <circle cx="50" cy="50" r="48" fill="#171717" />
+                  <ellipse cx="35" cy="35" rx="35" ry="18" fill="#525252" transform="rotate(40, 35, 35)" />
+                  <ellipse cx="65" cy="70" rx="40" ry="12" fill="#000000" transform="rotate(-25, 65, 70)" />
+                </g>
+                <circle cx="50" cy="50" r="49.5" fill={`url(#acrylicShine-${lp.id})`} />
+                <circle cx="50" cy="50" r="13.5" fill="#0c0c0c" />
+                <text x="50" y="51" textAnchor="middle" fontSize="2.2" fill="white" fontWeight="800" letterSpacing="0.5">THIRSTY</text>
+              </g>
+            ) : (
+              /* ── 기본 블랙/기타 ── */
+              <g clipPath={`url(#vclip-${lp.id})`}>
+                <circle cx="50" cy="50" r="49.5" fill={c}/>
+                <circle cx="50" cy="50" r="13" fill="#ddd0b0"/>
+              </g>
             )}
-            {/* Label gloss dome */}
-            <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "radial-gradient(circle at 28% 20%, rgba(255,255,255,0.18), transparent 52%)", pointerEvents: "none", zIndex: 2 }} />
-            {/* Label concentric rings */}
-            {[px(8), px(14), px(20)].map((inset) => (
-              <div key={inset} style={{ position: "absolute", inset, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.10)", pointerEvents: "none", zIndex: 2 }} />
-            ))}
-            {/* Label text (only when no cover image) */}
-            {!lp.coverUrl && (
-              <>
-                <p style={{ fontSize: px(8), color: "rgba(255,255,255,0.92)", fontWeight: 700, textAlign: "center", lineHeight: 1.2, padding: `0 ${px(8)}px`, zIndex: 3, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", maxWidth: "100%" }}>
-                  {lp.title}
-                </p>
-                <div style={{ width: px(36), height: 1, background: "rgba(255,255,255,0.18)", margin: `${px(3)}px 0 ${px(2)}px`, zIndex: 3 }} />
-                <p style={{ fontSize: px(7), color: "rgba(255,255,255,0.55)", zIndex: 3 }}>{side}면</p>
-                <p style={{ fontSize: px(5.5), color: "rgba(255,255,255,0.28)", zIndex: 3, marginTop: px(1) }}>{lp.label}</p>
-              </>
-            )}
+
+            <circle cx="50" cy="50" r="2.5" fill="#1a1612"/><circle cx="50" cy="50" r="1.5" fill="#0e0c0a"/>
+          </svg>
+        </div>
+
+        {/* ── [수정] Tonearm - 금속 질감 강화 및 디테일 추가 ── */}
+        <div
+          style={{
+            position: "absolute", width: armW, height: armH, top: px(15), right: px(15), zIndex: 10,
+            transformOrigin: `${pivX}px ${pivY}px`, transform: `rotate(${tonearmDeg}deg)`,
+            transition: "transform 2s cubic-bezier(0.25, 1, 0.3, 1)", // 더 부드럽게
+          }}
+        >
+          {/* 피벗 베이스 - 크롬 질감 */}
+          <div style={{ position: "absolute", width: px(32), height: px(32), top: 0, left: 0, borderRadius: "50%", background: "radial-gradient(circle at 30% 30%, #fff 0%, #aaa 40%, #555 80%, #888 100%)", boxShadow: `0 ${px(6)}px ${px(18)}px rgba(0,0,0,0.8)` }} />
+          {/* 안티스케이팅 다이얼 디테일 */}
+          <div style={{ position: "absolute", width: px(12), height: px(12), top: px(10), left: px(25), borderRadius: "50%", background: "#222", border: '1px solid #444' }} />
+          
+          {/* 톤암 튜브 - 금속 헤어라인 질감 */}
+          <div style={{ position: "absolute", width: px(7), height: armH - px(50), top: px(28), left: pivX - px(3.5), background: "linear-gradient(90deg, #e0e0e0 0%, #888 30%, #fff 60%, #999 100%)", borderRadius: px(3.5) }} />
+          
+          {/* 카트리지/헤드쉘 - 검은치마 포인트 */}
+          <div style={{ position: "absolute", width: px(38), height: px(16), top: armH - px(52), left: px(-9), background: "linear-gradient(100deg, #333 0%, #111 100%)", borderRadius: `${px(2)}px ${px(6)}px ${px(2)}px ${px(2)}px`, transform: 'rotate(15deg)', border: '1px solid #000' }}>
+            {/* 작은 검은치마 로고 'B' */}
+            <span style={{color: '#fff', fontSize: px(10), fontWeight: 'bold', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%) rotate(-15deg)', opacity: 0.8}}>B</span>
           </div>
-
-          {/* Spindle hole */}
-          <div style={{ position: "absolute", width: px(7), height: px(7), top: "50%", left: "50%", transform: "translate(-50%,-50%)", borderRadius: "50%", background: "#020202", boxShadow: "0 0 0 1px rgba(255,255,255,0.06)" }} />
-        </div>
-
-        {/* ── Strobe dots ── */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: platY + px(8),
-            left: platX + platD / 2,
-            transform: "translateX(-50%)",
-            display: "flex",
-            gap: px(3),
-          }}
-        >
-          {Array.from({ length: 16 }).map((_, i) => (
-            <div
-              key={i}
-              style={{
-                width: px(3.5), height: px(3.5),
-                borderRadius: "50%",
-                background: isPlaying
-                  ? i % 4 === 0
-                    ? "rgba(255,215,40,0.95)"
-                    : "rgba(255,215,40,0.15)"
-                  : "rgba(255,255,255,0.07)",
-                transition: "background 0.5s",
-              }}
-            />
-          ))}
-        </div>
-
-        {/* ── Tonearm assembly ── */}
-        <div
-          style={{
-            position: "absolute",
-            width: armW, height: armH,
-            top: px(18), right: px(18),
-            transformOrigin: `${pivX}px ${pivY}px`,
-            transform: `rotate(${tonearmDeg}deg)`,
-            transition: "transform 1.8s cubic-bezier(0.23, 1, 0.32, 1)",
-          }}
-        >
-          {/* Counterweight cylinder */}
-          <div style={{ position: "absolute", width: px(22), height: px(22), top: px(-12), left: px(2), borderRadius: "50%", background: "radial-gradient(circle at 30% 30%, #787878, #1c1c1c)", boxShadow: `0 ${px(2)}px ${px(10)}px rgba(0,0,0,0.6)` }} />
-          {/* Pivot base disc */}
-          <div style={{ position: "absolute", width: px(28), height: px(28), top: 0, left: 0, borderRadius: "50%", background: "radial-gradient(circle at 28% 25%, #aaaaaa, #2a2a2a)", boxShadow: [`0 ${px(4)}px ${px(14)}px rgba(0,0,0,0.7)`, `inset 0 ${px(1)}px 0 rgba(255,255,255,0.25)`].join(",") }} />
-          {/* Arm shaft */}
-          <div style={{ position: "absolute", width: px(6), height: armH - px(52), top: px(28), left: pivX - px(3), background: "linear-gradient(90deg, #b8b8b8 0%, #5a5a5a 40%, #d0d0d0 65%, #6a6a6a 100%)", borderRadius: px(3), boxShadow: `${px(1.5)}px 0 ${px(5)}px rgba(0,0,0,0.45)` }} />
-          {/* S-bend */}
-          <div style={{ position: "absolute", width: px(26), height: px(18), top: armH - px(64), left: px(1), borderLeft: `${px(5)}px solid #909090`, borderBottom: `${px(5)}px solid #909090`, borderRadius: `0 0 0 ${px(10)}px` }} />
-          {/* Headshell */}
-          <div style={{ position: "absolute", width: px(34), height: px(13), top: armH - px(50), left: px(-7), background: "linear-gradient(90deg, #c8c8c8, #6e6e6e 55%, #c0c0c0 100%)", borderRadius: px(4), boxShadow: `0 ${px(2)}px ${px(8)}px rgba(0,0,0,0.5)` }} />
-          {/* Cartridge body */}
-          <div style={{ position: "absolute", width: px(18), height: px(10), top: armH - px(38), left: px(2), background: "linear-gradient(180deg, #7a7a7a, #292929)", borderRadius: px(2) }} />
-          {/* Stylus */}
+          
+          {/* 스타일러스(바늘) - 재생 중일 때 퍼플 빛 */}
           <div
             style={{
-              position: "absolute",
-              width: px(2), height: px(20),
-              top: armH - px(30),
-              left: pivX - px(1),
-              borderRadius: `0 0 ${px(2)}px ${px(2)}px`,
-              background: isPlaying
-                ? `linear-gradient(180deg, #d0d0d0 0%, #7c3aed 100%)`
-                : `linear-gradient(180deg, #c0c0c0 0%, #808080 100%)`,
-              boxShadow: isPlaying
-                ? `0 0 ${px(9)}px rgba(124,58,237,0.95), 0 0 ${px(22)}px rgba(124,58,237,0.35)`
-                : "none",
-              transition: "box-shadow 0.7s ease, background 0.7s ease",
+              position: "absolute", width: px(2), height: px(18), top: armH - px(32), left: pivX + px(1),
+              background: isPlaying ? `linear-gradient(180deg, #fff 0%, #9333ea 100%)` : "#666",
+              boxShadow: isPlaying ? `0 0 ${px(10)}px #a855f7` : "none",
+              transform: 'rotate(10deg)', transition: 'background 1s, box-shadow 1s'
             }}
           />
-          {/* Cantilever contact glow when playing */}
-          {isPlaying && (
-            <div
-              style={{
-                position: "absolute",
-                width: px(10), height: px(10),
-                top: armH - px(12),
-                left: pivX - px(5),
-                borderRadius: "50%",
-                background: "rgba(167,139,250,0.35)",
-                filter: `blur(${px(4)}px)`,
-                animation: "stylus-pulse 1.2s ease-in-out infinite alternate",
-              }}
-            />
-          )}
         </div>
 
-        {/* ── Indicator panel (right strip) ── */}
+        {/* ── [추가] 컨트롤 영역 (좌측 하단) ── */}
+        {/* RPM 선택 버튼 */}
+        <div style={{ position: 'absolute', bottom: px(40), left: px(30), display: 'flex', gap: px(6) }}>
+          <div style={{ width: px(20), height: px(10), background: '#111', border: '1px solid #333', borderRadius: px(2), color: isPlaying ? '#aaa' : '#fff', fontSize: px(7), display: 'flex', alignItems: 'center', justifyContent: 'center'}}>33</div>
+          <div style={{ width: px(20), height: px(10), background: '#111', border: '1px solid #333', borderRadius: px(2), color: '#555', fontSize: px(7), display: 'flex', alignItems: 'center', justifyContent: 'center'}}>45</div>
+        </div>
+        {/* Power LED (수정) */}
         <div
           style={{
-            position: "absolute",
-            top: px(110), right: px(18),
-            display: "flex", flexDirection: "column",
-            alignItems: "center", gap: px(8),
+            position: "absolute", bottom: px(41), left: px(85), width: px(9), height: px(9), borderRadius: "50%",
+            background: isPlaying ? "#4ade80" : "#222",
+            border: `1px solid ${isPlaying ? "#22c55e" : "#444"}`,
+            boxShadow: isPlaying ? `0 0 ${px(12)}px rgba(74,222,128,0.8), inset 0 0 4px rgba(255,255,255,0.5)` : "inset 0 0 3px #000",
+            transition: 'background 1s, box-shadow 1s'
           }}
-        >
-          {/* Power LED */}
-          <div
-            style={{
-              width: px(8), height: px(8),
-              borderRadius: "50%",
-              background: isPlaying ? "#4ade80" : "#141414",
-              boxShadow: isPlaying
-                ? `0 0 ${px(9)}px rgba(74,222,128,0.9), 0 0 ${px(20)}px rgba(74,222,128,0.3)`
-                : "none",
-              transition: "all 0.5s",
-            }}
-          />
-          {/* Speed labels */}
-          {["33⅓", "45"].map((s, i) => (
-            <p
-              key={s}
-              style={{
-                fontSize: px(7.5),
-                fontFamily: "monospace",
-                color: i === 0 ? "rgba(255,255,255,0.40)" : "rgba(255,255,255,0.09)",
-                letterSpacing: "0.05em",
-              }}
-            >
-              {s}
-            </p>
-          ))}
+        />
+        
+        {/* [추가] 톤암 리프터 레버 (우측 하단) */}
+        <div style={{ position: 'absolute', bottom: px(40), right: px(70), width: px(4), height: px(25), background: 'linear-gradient(90deg, #888, #fff, #888)', borderRadius: px(2), transform: isPlaying ? 'rotate(10deg)' : 'rotate(-15deg)', transition: 'transform 1s cubic-bezier(0.23, 1, 0.32, 1)', transformOrigin: 'bottom center' }}>
+          <div style={{ width: px(10), height: px(10), borderRadius: '50%', background: '#111', position: 'absolute', top: px(-5), left: px(-3), border: '1px solid #333' }} />
         </div>
 
-        {/* ── Bottom brand plate ── */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: px(14), right: px(22),
-            fontSize: px(8),
-            letterSpacing: "0.2em",
-            color: "rgba(255,255,255,0.08)",
-            textTransform: "uppercase",
-            fontWeight: 700,
-          }}
-        >
-          LP Player
-        </div>
-
-        {/* Top chrome highlight */}
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, borderRadius: `${px(18)}px ${px(18)}px 0 0`, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.07) 30%, rgba(255,255,255,0.07) 70%, transparent)", pointerEvents: "none" }} />
       </div>
-
-      {/* Stylus pulse keyframe */}
-      <style>{`
-        @keyframes stylus-pulse {
-          from { opacity: 0.35; transform: scale(0.8); }
-          to   { opacity: 0.9;  transform: scale(1.3); }
-        }
-      `}</style>
     </div>
   );
 }

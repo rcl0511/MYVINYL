@@ -13,7 +13,7 @@ export interface LyricLine {
   text: string;
 }
 
-export type VinylStyle = "standard" | "color" | "splatter" | "marble";
+export type VinylStyle = "standard" | "color" | "splatter" | "marble" | "red" | "emerald";
 
 export interface LP {
   id: string;

@@ -51,7 +51,7 @@ export default function LPDetailClient({ lp }: { lp: LP }) {
 
           {/* Album cover */}
           <div
-            className="w-full aspect-square rounded-2xl shadow-xl flex items-center justify-center relative overflow-hidden mb-8"
+            className="w-full aspect-square rounded-2xl shadow-xl relative overflow-hidden mb-8"
             style={{ backgroundColor: lp.coverColor }}
           >
             {lp.coverUrl && (
@@ -61,13 +61,6 @@ export default function LPDetailClient({ lp }: { lp: LP }) {
                 className="absolute inset-0 w-full h-full object-cover opacity-85"
               />
             )}
-            <div className="w-36 h-36 rounded-full border-4 border-white/20 relative flex items-center justify-center z-10">
-              <div
-                className="absolute inset-0 rounded-full"
-                style={{ background: `radial-gradient(circle at 40% 40%, ${lp.coverColor}cc, #000)` }}
-              />
-              <div className="w-12 h-12 rounded-full bg-white/30 z-10" />
-            </div>
             {/* Genre badge */}
             <span className="absolute top-4 right-4 px-3 py-1 bg-black/40 text-white text-xs font-medium rounded-full backdrop-blur-sm z-10">
               {lp.genre}

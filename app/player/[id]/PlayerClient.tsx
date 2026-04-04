@@ -255,8 +255,7 @@ export default function PlayerClient({ lp }: { lp: LP }) {
   return (
     /* Full-screen overlay — covers GNB */
     <div
-      className="fixed inset-0 z-[60] flex flex-col overflow-hidden"
-      style={{ background: "#03030a" }}
+      className="fixed inset-0 z-[60] flex flex-col overflow-hidden bg-lp-bg"
       onMouseMove={resetHideTimer}
       onClick={resetHideTimer}
     >
@@ -269,7 +268,7 @@ export default function PlayerClient({ lp }: { lp: LP }) {
             width: "70vw", height: "70vw",
             top: "50%", left: "50%",
             transform: "translate(-50%, -55%)",
-            background: `radial-gradient(circle, rgba(${r},${g},${b},${state === "playing" ? 0.28 : 0.10}) 0%, transparent 65%)`,
+            background: `radial-gradient(circle, rgba(${r},${g},${b},${state === "playing" ? 0.15 : 0.05}) 0%, transparent 65%)`,
             filter: "blur(60px)",
             transition: "background 2s ease",
           }}
@@ -280,7 +279,7 @@ export default function PlayerClient({ lp }: { lp: LP }) {
           style={{
             width: "45vw", height: "45vw",
             bottom: "-10%", left: "-10%",
-            background: `radial-gradient(circle, rgba(${r},${g},${b},0.12) 0%, transparent 70%)`,
+            background: `radial-gradient(circle, rgba(${r},${g},${b},0.08) 0%, transparent 70%)`,
             filter: "blur(80px)",
           }}
         />
@@ -290,20 +289,8 @@ export default function PlayerClient({ lp }: { lp: LP }) {
           style={{
             width: "40vw", height: "40vw",
             top: "-5%", right: "-5%",
-            background: `radial-gradient(circle, rgba(${Math.min(r+30,255)},${Math.min(g+20,255)},${Math.min(b+60,255)},0.10) 0%, transparent 70%)`,
+            background: `radial-gradient(circle, rgba(${Math.min(r+30,255)},${Math.min(g+20,255)},${Math.min(b+60,255)},0.06) 0%, transparent 70%)`,
             filter: "blur(90px)",
-          }}
-        />
-        {/* Vignette */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `
-              radial-gradient(ellipse 75% 75% at 50% 50%,
-                transparent 40%,
-                rgba(0,0,0,0.55) 100%
-              )
-            `,
           }}
         />
       </div>
@@ -316,7 +303,7 @@ export default function PlayerClient({ lp }: { lp: LP }) {
         {/* Back */}
         <Link
           href={`/lp/${lp.id}`}
-          className="flex items-center gap-2 text-white/50 hover:text-white transition-colors text-xs sm:text-sm"
+          className="flex items-center gap-2 text-lp-secondary hover:text-lp-accent transition-colors text-xs sm:text-sm"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path d="M19 12H5M5 12l7 7M5 12l7-7" />
@@ -326,8 +313,8 @@ export default function PlayerClient({ lp }: { lp: LP }) {
 
         {/* Album info center */}
         <div className="text-center flex-1 px-2">
-          <p className="text-white/80 font-semibold text-xs sm:text-sm leading-tight truncate">{lp.title}</p>
-          <p className="text-white/40 text-[10px] sm:text-xs mt-0.5 truncate">{lp.artist} · {lp.year}</p>
+          <p className="text-lp-primary font-semibold text-xs sm:text-sm leading-tight truncate">{lp.title}</p>
+          <p className="text-lp-tertiary text-[10px] sm:text-xs mt-0.5 truncate">{lp.artist} · {lp.year}</p>
         </div>
 
         {/* Right actions */}
@@ -337,38 +324,38 @@ export default function PlayerClient({ lp }: { lp: LP }) {
             onClick={() => setShowTracklist((v) => !v)}
             className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
               showTracklist
-                ? "bg-white/15 text-white"
-                : "text-white/40 hover:text-white hover:bg-white/8"
+                ? "bg-lp-accent-light text-lp-accent"
+                : "text-lp-secondary hover:text-lp-accent hover:bg-lp-chip"
             }`}
-            style={{ border: "1px solid rgba(255,255,255,0.1)" }}
+            style={{ border: "1px solid var(--color-lp-border)" }}
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
             </svg>
             트랙 목록
-            <span className="text-white/25">T</span>
+            <span className="text-lp-tertiary">T</span>
           </button>
           {/* Lyrics toggle */}
           <button
             onClick={() => setShowLyrics((v) => !v)}
             className={`flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-medium transition-colors ${
               showLyrics
-                ? "bg-white/15 text-white"
-                : "text-white/40 hover:text-white hover:bg-white/8"
+                ? "bg-lp-accent-light text-lp-accent"
+                : "text-lp-secondary hover:text-lp-accent hover:bg-lp-chip"
             }`}
-            style={{ border: "1px solid rgba(255,255,255,0.1)" }}
+            style={{ border: "1px solid var(--color-lp-border)" }}
           >
             <svg className="w-3 sm:w-3.5 h-3 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
             </svg>
             <span className="hidden sm:inline">가사</span>
-            <span className="text-white/25">L</span>
+            <span className="text-lp-tertiary">L</span>
           </button>
           {/* Custom */}
           <Link
             href={`/lp-editor/${lp.id}`}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs text-white/40 hover:text-white transition-colors"
-            style={{ border: "1px solid rgba(255,255,255,0.1)" }}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs text-lp-secondary hover:text-lp-accent transition-colors"
+            style={{ border: "1px solid var(--color-lp-border)" }}
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
@@ -384,20 +371,10 @@ export default function PlayerClient({ lp }: { lp: LP }) {
         {/* Prev LP ghost */}
         <button
           onClick={() => router.push(`/player/${prevLp.id}`)}
-          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 group z-10 transition-all duration-700"
-          style={{ opacity: uiVisible ? 0.4 : 0, pointerEvents: uiVisible ? "auto" : "none" }}
+          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-lp-accent-btn text-white z-10 transition-all duration-700 hover:scale-110"
+          style={{ opacity: uiVisible ? 0.9 : 0, pointerEvents: uiVisible ? "auto" : "none" }}
         >
-          <div
-            className="w-10 h-10 sm:w-14 sm:h-14 rounded-full group-hover:scale-110 transition-transform"
-            style={{
-              background: `conic-gradient(from 0deg, ${prevLp.coverColor}, #111 40%, ${prevLp.coverColor}88)`,
-              boxShadow: "0 4px 20px rgba(0,0,0,0.6)",
-            }}
-          />
-          <p className="hidden sm:block text-white/50 text-[10px] group-hover:text-white/80 transition-colors max-w-[72px] text-center truncate">
-            {prevLp.title}
-          </p>
-          <svg className="w-4 h-4 text-white/30 group-hover:text-white/60 sm:-mt-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path d="M15 19l-7-7 7-7" />
           </svg>
         </button>
@@ -424,20 +401,10 @@ export default function PlayerClient({ lp }: { lp: LP }) {
         {/* Next LP ghost */}
         <button
           onClick={() => router.push(`/player/${nextLp.id}`)}
-          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 group z-10 transition-all duration-700"
-          style={{ opacity: uiVisible ? 0.4 : 0, pointerEvents: uiVisible ? "auto" : "none" }}
+          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-lp-accent-btn text-white z-10 transition-all duration-700 hover:scale-110"
+          style={{ opacity: uiVisible ? 0.9 : 0, pointerEvents: uiVisible ? "auto" : "none" }}
         >
-          <div
-            className="w-10 h-10 sm:w-14 sm:h-14 rounded-full group-hover:scale-110 transition-transform"
-            style={{
-              background: `conic-gradient(from 0deg, ${nextLp.coverColor}, #111 40%, ${nextLp.coverColor}88)`,
-              boxShadow: "0 4px 20px rgba(0,0,0,0.6)",
-            }}
-          />
-          <p className="hidden sm:block text-white/50 text-[10px] group-hover:text-white/80 transition-colors max-w-[72px] text-center truncate">
-            {nextLp.title}
-          </p>
-          <svg className="w-4 h-4 text-white/30 group-hover:text-white/60 sm:-mt-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path d="M9 5l7 7-7 7" />
           </svg>
         </button>
@@ -448,19 +415,19 @@ export default function PlayerClient({ lp }: { lp: LP }) {
           style={{
             transform: showTracklist ? "translateX(0)" : "translateX(-100%)",
             transition: "transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)",
-            background: "rgba(5,5,15,0.92)",
+            background: "rgba(255,255,255,0.95)",
             backdropFilter: "blur(20px)",
-            borderRight: "1px solid rgba(255,255,255,0.06)",
+            borderRight: "1px solid var(--color-lp-border)",
           }}
         >
-          <div className="px-5 pt-4 pb-3 flex items-center justify-between border-b border-white/6">
+          <div className="px-5 pt-4 pb-3 flex items-center justify-between border-b border-lp-border">
             <div>
-              <p className="text-white/80 font-semibold text-sm">{lp.title}</p>
-              <p className="text-white/35 text-xs mt-0.5">{side}면 · {sideTracks.length}트랙</p>
+              <p className="text-lp-primary font-semibold text-sm">{lp.title}</p>
+              <p className="text-lp-tertiary text-xs mt-0.5">{side}면 · {sideTracks.length}트랙</p>
             </div>
             {/* Mobile close button */}
             <button
-              className="sm:hidden w-8 h-8 flex items-center justify-center text-white/40 hover:text-white ml-2"
+              className="sm:hidden w-8 h-8 flex items-center justify-center text-lp-secondary hover:text-lp-accent ml-2"
               onClick={() => setShowTracklist(false)}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
@@ -468,15 +435,15 @@ export default function PlayerClient({ lp }: { lp: LP }) {
               </svg>
             </button>
             {/* A/B */}
-            <div className="flex gap-0 rounded-full overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.12)" }}>
+            <div className="flex gap-0 rounded-full overflow-hidden" style={{ border: "1px solid var(--color-lp-border)" }}>
               {(["A", "B"] as LPSide[]).map((s) => (
                 <button
                   key={s}
                   onClick={() => handleSideChange(s)}
                   className="px-3 py-1 text-xs font-semibold transition-colors"
                   style={{
-                    background: side === s ? "#7C3AED" : "transparent",
-                    color: side === s ? "#fff" : "rgba(255,255,255,0.3)",
+                    background: side === s ? "var(--color-lp-accent-btn)" : "transparent",
+                    color: side === s ? "#fff" : "var(--color-lp-secondary)",
                   }}
                 >
                   {s}
@@ -492,8 +459,8 @@ export default function PlayerClient({ lp }: { lp: LP }) {
                 <button
                   key={track.id}
                   onClick={() => { setTrackIdx(idx); setState("playing"); }}
-                  className="w-full flex items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-white/5"
-                  style={{ background: active ? "rgba(124,58,237,0.15)" : "transparent" }}
+                  className="w-full flex items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-lp-accent-light"
+                  style={{ background: active ? "var(--color-lp-accent-light)" : "transparent" }}
                 >
                   <span className="w-5 flex items-center justify-center shrink-0">
                     {active && state === "playing" ? (
@@ -504,25 +471,25 @@ export default function PlayerClient({ lp }: { lp: LP }) {
                             className="w-0.5 rounded-full"
                             style={{
                               height: h * 2.5,
-                              background: "#a78bfa",
+                              background: "var(--color-lp-accent-btn)",
                               animation: `eq-bar 0.6s ease-in-out ${i * 0.1}s infinite alternate`,
                             }}
                           />
                         ))}
                       </span>
                     ) : (
-                      <span style={{ fontSize: 11, color: active ? "#a78bfa" : "rgba(255,255,255,0.25)" }}>
+                      <span style={{ fontSize: 11, color: active ? "var(--color-lp-accent)" : "var(--color-lp-tertiary)" }}>
                         {track.number}
                       </span>
                     )}
                   </span>
                   <span
                     className="flex-1 text-sm truncate"
-                    style={{ color: active ? "#c4b5fd" : "rgba(255,255,255,0.65)", fontWeight: active ? 600 : 400 }}
+                    style={{ color: active ? "var(--color-lp-accent)" : "var(--color-lp-primary)", fontWeight: active ? 600 : 400 }}
                   >
                     {track.title}
                   </span>
-                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.2)" }} className="tabular-nums">
+                  <span style={{ fontSize: 11, color: "var(--color-lp-tertiary)" }} className="tabular-nums">
                     {track.duration}
                   </span>
                 </button>
@@ -557,7 +524,7 @@ export default function PlayerClient({ lp }: { lp: LP }) {
 
       {/* ── Keyboard hint ── */}
       <div
-        className="hidden sm:flex absolute bottom-3 right-4 gap-3 text-white/15 text-[10px] transition-all duration-700"
+        className="hidden sm:flex absolute bottom-3 right-4 gap-3 text-lp-tertiary text-[10px] transition-all duration-700"
         style={{ opacity: uiVisible ? 1 : 0 }}
       >
         <span>Space 재생/정지</span>
@@ -576,9 +543,9 @@ export default function PlayerClient({ lp }: { lp: LP }) {
         <div
           className="absolute bottom-24 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm"
           style={{
-            background: "rgba(220,38,38,0.18)",
-            border: "1px solid rgba(220,38,38,0.35)",
-            color: "rgba(252,165,165,0.9)",
+            background: "rgba(239,68,68,0.1)",
+            border: "1px solid var(--color-lp-danger)",
+            color: "var(--color-lp-danger)",
             backdropFilter: "blur(12px)",
           }}
         >

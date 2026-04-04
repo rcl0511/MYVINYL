@@ -50,20 +50,20 @@ export default function PlayerControls({
     <div
       className="w-full max-w-2xl mx-auto rounded-2xl px-4 sm:px-7 py-4 sm:py-5"
       style={{
-        background: "rgba(6,4,18,0.72)",
+        background: "rgba(255,255,255,0.9)",
         backdropFilter: "blur(28px)",
         WebkitBackdropFilter: "blur(28px)",
-        border: "1px solid rgba(255,255,255,0.07)",
-        boxShadow: "0 24px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)",
+        border: "1px solid var(--color-lp-border)",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
       }}
     >
       {/* Track info + A/B */}
       <div className="flex items-center justify-between mb-4">
         <div className="min-w-0 flex-1">
-          <p className="text-white font-semibold text-sm leading-tight truncate">
+          <p className="text-lp-primary font-semibold text-sm leading-tight truncate">
             {currentTrack?.title ?? "트랙을 선택하세요"}
           </p>
-          <p className="text-white/35 text-xs mt-0.5">
+          <p className="text-lp-tertiary text-xs mt-0.5">
             {side}면{currentTrack ? ` · #${currentTrack.number}` : ""}
           </p>
         </div>
@@ -72,15 +72,15 @@ export default function PlayerControls({
         <button
           onClick={onSideToggle}
           className="flex shrink-0 ml-4 rounded-full overflow-hidden"
-          style={{ border: "1px solid rgba(255,255,255,0.12)" }}
+          style={{ border: "1px solid var(--color-lp-border)" }}
         >
           {(["A", "B"] as LPSide[]).map((s) => (
             <span
               key={s}
               className="px-3.5 py-1 text-xs font-bold transition-colors"
               style={{
-                background: side === s ? "#7C3AED" : "transparent",
-                color:      side === s ? "#fff"    : "rgba(255,255,255,0.28)",
+                background: side === s ? "var(--color-lp-accent-btn)" : "transparent",
+                color:      side === s ? "#fff"    : "var(--color-lp-secondary)",
               }}
             >
               {s}
@@ -94,7 +94,7 @@ export default function PlayerControls({
         <div
           ref={barRef}
           className="relative h-1 rounded-full cursor-pointer group"
-          style={{ background: "rgba(255,255,255,0.08)" }}
+          style={{ background: "var(--color-lp-border)" }}
           onClick={handleBar}
         >
           {/* Played fill */}
@@ -102,7 +102,7 @@ export default function PlayerControls({
             className="absolute top-0 left-0 h-full rounded-full"
             style={{
               width: `${progress}%`,
-              background: "linear-gradient(90deg, #6d28d9, #a78bfa)",
+              background: "linear-gradient(90deg, var(--color-lp-accent), var(--color-lp-accent-btn))",
               transition: "width 0.9s linear",
             }}
           />
@@ -112,14 +112,14 @@ export default function PlayerControls({
             style={{
               width: 13, height: 13,
               left: `calc(${progress}% - 6.5px)`,
-              background: "#c4b5fd",
-              boxShadow: "0 0 10px rgba(196,181,253,0.85)",
+              background: "var(--color-lp-accent-btn)",
+              boxShadow: "0 0 10px rgba(124,58,237,0.4)",
             }}
           />
         </div>
         <div className="flex justify-between mt-1.5">
-          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.28)" }}>{fmt(elapsed)}</span>
-          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.18)" }}>{currentTrack?.duration ?? "—"}</span>
+          <span style={{ fontSize: 11, color: "var(--color-lp-tertiary)" }}>{fmt(elapsed)}</span>
+          <span style={{ fontSize: 11, color: "var(--color-lp-placeholder)" }}>{currentTrack?.duration ?? "—"}</span>
         </div>
       </div>
 
@@ -129,7 +129,7 @@ export default function PlayerControls({
         <div className="hidden sm:flex items-center gap-2 w-36 shrink-0">
           <button
             onClick={() => onVolumeChange(volume === 0 ? 70 : 0)}
-            className="text-white/30 hover:text-white/60 transition-colors shrink-0"
+            className="text-lp-tertiary hover:text-lp-secondary transition-colors shrink-0"
           >
             {volume === 0 ? (
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -145,9 +145,9 @@ export default function PlayerControls({
             type="range" min={0} max={100} value={volume}
             onChange={(e) => onVolumeChange(Number(e.target.value))}
             className="flex-1 h-1 cursor-pointer"
-            style={{ accentColor: "#7C3AED" }}
+            style={{ accentColor: "var(--color-lp-accent-btn)" }}
           />
-          <span style={{ fontSize: 10, color: "rgba(255,255,255,0.2)", minWidth: 22, textAlign: "right" }}>
+          <span style={{ fontSize: 10, color: "var(--color-lp-tertiary)", minWidth: 22, textAlign: "right" }}>
             {volume}
           </span>
         </div>
@@ -156,7 +156,7 @@ export default function PlayerControls({
         <div className="flex items-center justify-center gap-5 flex-1">
           <button
             onClick={onPrev}
-            className="w-10 h-10 flex items-center justify-center rounded-full transition-all text-white/35 hover:text-white hover:bg-white/6"
+            className="w-10 h-10 flex items-center justify-center rounded-full transition-all text-lp-tertiary hover:text-lp-secondary hover:bg-lp-chip"
           >
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
               <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z" />
@@ -169,10 +169,10 @@ export default function PlayerControls({
             style={{
               width: 60, height: 60,
               borderRadius: "50%",
-              background: "linear-gradient(145deg, #8b5cf6, #5B21B6)",
+              background: "linear-gradient(145deg, var(--color-lp-accent-btn), var(--color-lp-accent))",
               boxShadow: isPlaying
-                ? "0 0 0 6px rgba(124,58,237,0.15), 0 10px 40px rgba(124,58,237,0.55)"
-                : "0 10px 32px rgba(124,58,237,0.40)",
+                ? "0 0 0 6px rgba(124,58,237,0.15), 0 10px 40px rgba(124,58,237,0.35)"
+                : "0 10px 32px rgba(124,58,237,0.25)",
             }}
           >
             {isPlaying ? (
@@ -188,7 +188,7 @@ export default function PlayerControls({
 
           <button
             onClick={onNext}
-            className="w-10 h-10 flex items-center justify-center rounded-full transition-all text-white/35 hover:text-white hover:bg-white/6"
+            className="w-10 h-10 flex items-center justify-center rounded-full transition-all text-lp-tertiary hover:text-lp-secondary hover:bg-lp-chip"
           >
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
               <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
@@ -198,7 +198,7 @@ export default function PlayerControls({
 
         {/* Mobile: volume toggle only */}
         <button
-          className="sm:hidden w-8 h-8 flex items-center justify-center text-white/30 hover:text-white/60 transition-colors shrink-0"
+          className="sm:hidden w-8 h-8 flex items-center justify-center text-lp-tertiary hover:text-lp-secondary transition-colors shrink-0"
           onClick={() => onVolumeChange(volume === 0 ? 70 : 0)}
         >
           {volume === 0 ? (
@@ -218,8 +218,8 @@ export default function PlayerControls({
             href={`/lp-editor/${lpId}`}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-colors"
             style={{
-              border: "1px solid rgba(255,255,255,0.1)",
-              color: "rgba(255,255,255,0.35)",
+              border: "1px solid var(--color-lp-border)",
+              color: "var(--color-lp-secondary)",
             }}
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">

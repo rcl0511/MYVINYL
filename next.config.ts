@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
         hostname: "*.coverartarchive.org",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "archive.org",
+        pathname: "/**",
+      },
     ],
   },
 };

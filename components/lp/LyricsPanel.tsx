@@ -63,20 +63,20 @@ export default function LyricsPanel({ lyrics, currentTime, isPlaying, onClose }:
 
   if (!lyrics.length) {
     return (
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-xl border-t border-white/10">
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-t border-lp-border">
         <div className="max-w-3xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-white font-semibold">가사</h3>
+            <h3 className="text-lp-primary font-semibold">가사</h3>
             <button
               onClick={onClose}
-              className="text-white/60 hover:text-white transition-colors"
+              className="text-lp-secondary hover:text-lp-primary transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                 <path d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
-          <p className="text-gray-400 text-sm text-center py-8">
+          <p className="text-lp-tertiary text-sm text-center py-8">
             가사 정보가 없습니다
           </p>
         </div>
@@ -85,9 +85,9 @@ export default function LyricsPanel({ lyrics, currentTime, isPlaying, onClose }:
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-xl border-t border-white/10 transition-all duration-300">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-t border-lp-border transition-all duration-300">
       {/* Header */}
-      <div className="max-w-3xl mx-auto px-4 py-4 border-b border-white/10">
+      <div className="max-w-3xl mx-auto px-4 py-4 border-b border-lp-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
@@ -96,8 +96,8 @@ export default function LyricsPanel({ lyrics, currentTime, isPlaying, onClose }:
               </svg>
             </div>
             <div>
-              <h3 className="text-white font-semibold">가사</h3>
-              <p className="text-gray-400 text-xs">
+              <h3 className="text-lp-primary font-semibold">가사</h3>
+              <p className="text-lp-tertiary text-xs">
                 {isPlaying ? "재생 중" : "일시정지"}
               </p>
             </div>
@@ -105,7 +105,7 @@ export default function LyricsPanel({ lyrics, currentTime, isPlaying, onClose }:
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-white/60 hover:text-white transition-colors p-2"
+              className="text-lp-secondary hover:text-lp-primary transition-colors p-2"
             >
               <svg
                 className={`w-5 h-5 transition-transform ${isExpanded ? "rotate-180" : ""}`}
@@ -119,7 +119,7 @@ export default function LyricsPanel({ lyrics, currentTime, isPlaying, onClose }:
             </button>
             <button
               onClick={onClose}
-              className="text-white/60 hover:text-white transition-colors p-2"
+              className="text-lp-secondary hover:text-lp-primary transition-colors p-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                 <path d="M6 18L18 6M6 6l12 12" />
@@ -145,8 +145,8 @@ export default function LyricsPanel({ lyrics, currentTime, isPlaying, onClose }:
               ref={index === activeIndex ? activeLineRef : null}
               className={`text-center transition-all duration-300 ${
                 index === activeIndex
-                  ? "text-white text-lg font-semibold scale-105"
-                  : "text-gray-500 text-sm"
+                  ? "text-lp-primary text-lg font-semibold scale-105"
+                  : "text-lp-secondary text-sm"
               }`}
               style={{
                 opacity: index === activeIndex ? 1 : 0.5,
@@ -160,12 +160,12 @@ export default function LyricsPanel({ lyrics, currentTime, isPlaying, onClose }:
       </div>
 
       {/* Progress indicator */}
-      <div className="max-w-3xl mx-auto px-4 py-3 border-t border-white/10">
+      <div className="max-w-3xl mx-auto px-4 py-3 border-t border-lp-border">
         <div className="flex items-center gap-3">
-          <span className="text-white/60 text-xs tabular-nums">
+          <span className="text-lp-tertiary text-xs tabular-nums">
             {formatTime(currentTime)}
           </span>
-          <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+          <div className="flex-1 h-1 bg-lp-border rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-300"
               style={{
@@ -173,7 +173,7 @@ export default function LyricsPanel({ lyrics, currentTime, isPlaying, onClose }:
               }}
             />
           </div>
-          <span className="text-white/60 text-xs tabular-nums">
+          <span className="text-lp-tertiary text-xs tabular-nums">
             {formatTime(lyrics[lyrics.length - 1]?.time || 0)}
           </span>
         </div>
