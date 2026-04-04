@@ -179,7 +179,7 @@ export default function Turntable({
         <div
           ref={discRef}
           className={onSeek ? "cursor-crosshair" : ""}
-          style={{ position: "absolute", width: discD, height: discD, top: discY, left: discX, borderRadius: "50%", zIndex: 5 }}
+          style={{ position: "absolute", width: discD, height: discD, top: discY, left: discX, borderRadius: "50%", zIndex: 1 }}
           onClick={handleDisc}
         >
           <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", borderRadius: "50%", boxShadow: `0 ${px(10)}px ${px(40)}px rgba(0,0,0,0.8)` }} viewBox="0 0 100 100">
@@ -189,8 +189,8 @@ export default function Turntable({
               </clipPath>
 
               {/* 그라데이션 정의 (Red, Emerald, Smoke, Shine 등...) */}
-              <radialGradient id={`redAcrylic-${lp.id}`} cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#9f1239" stopOpacity="0.7" />
+              <radialGradient id={`redAcrylic-${lp.id}`} cx="70%" cy="70%" r="70%">
+                <stop offset="80%" stopColor="#9f1239" stopOpacity="0.95" />
                 <stop offset="100%" stopColor="#9f1239" stopOpacity="0.95" />
               </radialGradient>
               <radialGradient id={`emeraldAcrylic-${lp.id}`} cx="50%" cy="50%" r="50%">
@@ -202,11 +202,11 @@ export default function Turntable({
                 <stop offset="100%" stopColor="#0a0a0a" stopOpacity="0.9" />
               </radialGradient>
               <linearGradient id={`acrylicShine-${lp.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="5%" stopColor="white" stopOpacity="0.6" />
+                <stop offset="0%" stopColor="white" stopOpacity="0.2" />
                 <stop offset="20%" stopColor="white" stopOpacity="0" />
-                <stop offset="48%" stopColor="white" stopOpacity="0.2" />
-                <stop offset="52%" stopColor="white" stopOpacity="0" />
-                <stop offset="85%" stopColor="white" stopOpacity="0.45" />
+                <stop offset="45%" stopColor="white" stopOpacity="0.1" />
+                <stop offset="50%" stopColor="white" stopOpacity="0" />
+                <stop offset="90%" stopColor="white" stopOpacity="0.15" />
               </linearGradient>
               <filter id={`marbleFilter-${lp.id}`}>
                 <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="5" seed={lp.year} />

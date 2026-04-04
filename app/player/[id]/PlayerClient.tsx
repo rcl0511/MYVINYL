@@ -46,6 +46,7 @@ export default function PlayerClient({ lp }: { lp: LP }) {
   const [showLyrics, setShowLyrics] = useState(false);
   const [uiVisible, setUiVisible] = useState(true);
   const [turntableSize, setTurntableSize] = useState(520);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [ytError, setYtError] = useState(false);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -248,6 +249,11 @@ export default function PlayerClient({ lp }: { lp: LP }) {
     handleSideChange(side === "A" ? "B" : "A");
   }, [side, handleSideChange]);
 
+  const handleFullscreenToggle = useCallback(() => {
+    setIsFullscreen((prev) => !prev);
+    setTurntableSize((prev) => prev === 520 ? 800 : 520);
+  }, []);
+
   const lpIndex = MOCK_LPS.findIndex((l) => l.id === lp.id);
   const prevLp = MOCK_LPS[(lpIndex - 1 + MOCK_LPS.length) % MOCK_LPS.length];
   const nextLp = MOCK_LPS[(lpIndex + 1) % MOCK_LPS.length];
@@ -362,6 +368,23 @@ export default function PlayerClient({ lp }: { lp: LP }) {
             </svg>
             커스텀
           </Link>
+
+          {/* Fullscreen toggle */}
+          <button
+            onClick={handleFullscreenToggle}
+            className="flex items-center justify-center w-8 h-8 rounded-full text-lp-tertiary hover:text-lp-secondary transition-colors"
+            title={isFullscreen ? "축소" : "확장"}
+          >
+            {isFullscreen ? (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+              </svg>
+            )}
+          </button>
         </div>
       </div>
 
@@ -371,10 +394,18 @@ export default function PlayerClient({ lp }: { lp: LP }) {
         {/* Prev LP ghost */}
         <button
           onClick={() => router.push(`/player/${prevLp.id}`)}
-          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-lp-accent-btn text-white z-10 transition-all duration-700 hover:scale-110"
-          style={{ opacity: uiVisible ? 0.9 : 0, pointerEvents: uiVisible ? "auto" : "none" }}
+          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-11 h-11 sm:w-14 sm:h-14 rounded-full z-10 transition-all duration-300 hover:scale-110 active:scale-95"
+          style={{
+            opacity: uiVisible ? 1 : 0,
+            pointerEvents: uiVisible ? "auto" : "none",
+            background: "rgba(255, 255, 255, 0.95)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            border: "1px solid rgba(0, 0, 0, 0.08)",
+            boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)",
+          }}
         >
-          <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path d="M15 19l-7-7 7-7" />
           </svg>
         </button>
@@ -392,19 +423,57 @@ export default function PlayerClient({ lp }: { lp: LP }) {
 
           {/* Click center to play/pause */}
           <div
-            className="absolute inset-0 flex items-center justify-center pointer-events-auto cursor-pointer"
+            className="absolute flex items-center justify-center pointer-events-auto cursor-pointer group"
             onClick={() => setState((s) => s === "playing" ? "paused" : "playing")}
-            style={{ borderRadius: "50%", maxWidth: turntableSize * 0.6, maxHeight: turntableSize * 0.6, margin: "auto" }}
-          />
+            style={{
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: Math.min(turntableSize * 0.6, 300),
+              height: Math.min(turntableSize * 0.6, 300),
+              borderRadius: "50%",
+              zIndex: 50
+            }}
+          >
+            {/* Play/Pause indicator */}
+            <div
+              className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100"
+              style={{
+                background: "rgba(255, 255, 255, 0.95)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                border: "1px solid rgba(0, 0, 0, 0.08)",
+                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              {state === "playing" ? (
+                <svg className="w-7 h-7 sm:w-8 sm:h-8 text-gray-700" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                </svg>
+              ) : (
+                <svg className="w-7 h-7 sm:w-8 sm:h-8 text-gray-700 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Next LP ghost */}
         <button
           onClick={() => router.push(`/player/${nextLp.id}`)}
-          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-lp-accent-btn text-white z-10 transition-all duration-700 hover:scale-110"
-          style={{ opacity: uiVisible ? 0.9 : 0, pointerEvents: uiVisible ? "auto" : "none" }}
+          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-11 h-11 sm:w-14 sm:h-14 rounded-full z-10 transition-all duration-300 hover:scale-110 active:scale-95"
+          style={{
+            opacity: uiVisible ? 1 : 0,
+            pointerEvents: uiVisible ? "auto" : "none",
+            background: "rgba(255, 255, 255, 0.95)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            border: "1px solid rgba(0, 0, 0, 0.08)",
+            boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)",
+          }}
         >
-          <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path d="M9 5l7 7-7 7" />
           </svg>
         </button>

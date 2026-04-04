@@ -71,16 +71,19 @@ export default function PlayerControls({
         {/* A / B side pill */}
         <button
           onClick={onSideToggle}
-          className="flex shrink-0 ml-4 rounded-full overflow-hidden"
-          style={{ border: "1px solid var(--color-lp-border)" }}
+          className="flex shrink-0 ml-4 rounded-full overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95"
+          style={{
+            border: "1px solid var(--color-lp-border)",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          }}
         >
           {(["A", "B"] as LPSide[]).map((s) => (
             <span
               key={s}
-              className="px-3.5 py-1 text-xs font-bold transition-colors"
+              className="px-3.5 py-1 text-xs font-bold transition-all duration-300"
               style={{
                 background: side === s ? "var(--color-lp-accent-btn)" : "transparent",
-                color:      side === s ? "#fff"    : "var(--color-lp-secondary)",
+                color: side === s ? "#fff" : "var(--color-lp-secondary)",
               }}
             >
               {s}
@@ -110,10 +113,10 @@ export default function PlayerControls({
           <div
             className="absolute top-1/2 -translate-y-1/2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
             style={{
-              width: 13, height: 13,
-              left: `calc(${progress}% - 6.5px)`,
+              width: 12, height: 12,
+              left: `calc(${progress}% - 6px)`,
               background: "var(--color-lp-accent-btn)",
-              boxShadow: "0 0 10px rgba(124,58,237,0.4)",
+              boxShadow: "0 0 8px rgba(124,58,237,0.3)",
             }}
           />
         </div>
@@ -156,7 +159,7 @@ export default function PlayerControls({
         <div className="flex items-center justify-center gap-5 flex-1">
           <button
             onClick={onPrev}
-            className="w-10 h-10 flex items-center justify-center rounded-full transition-all text-lp-tertiary hover:text-lp-secondary hover:bg-lp-chip"
+            className="w-10 h-10 flex items-center justify-center transition-all duration-300 text-lp-tertiary hover:text-lp-secondary active:scale-95"
           >
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
               <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z" />
@@ -165,14 +168,12 @@ export default function PlayerControls({
 
           <button
             onClick={isPlaying ? onPause : onPlay}
-            className="flex items-center justify-center text-white transition-all active:scale-95"
+            className="flex items-center justify-center text-white transition-all duration-300 active:scale-95"
             style={{
               width: 60, height: 60,
               borderRadius: "50%",
-              background: "linear-gradient(145deg, var(--color-lp-accent-btn), var(--color-lp-accent))",
-              boxShadow: isPlaying
-                ? "0 0 0 6px rgba(124,58,237,0.15), 0 10px 40px rgba(124,58,237,0.35)"
-                : "0 10px 32px rgba(124,58,237,0.25)",
+              background: "var(--color-lp-accent-btn)",
+              boxShadow: "0 4px 16px rgba(124,58,237,0.3)",
             }}
           >
             {isPlaying ? (
@@ -188,7 +189,7 @@ export default function PlayerControls({
 
           <button
             onClick={onNext}
-            className="w-10 h-10 flex items-center justify-center rounded-full transition-all text-lp-tertiary hover:text-lp-secondary hover:bg-lp-chip"
+            className="w-10 h-10 flex items-center justify-center transition-all duration-300 text-lp-tertiary hover:text-lp-secondary active:scale-95"
           >
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
               <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
