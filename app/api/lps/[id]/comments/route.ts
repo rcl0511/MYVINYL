@@ -2,62 +2,40 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 
-// GET /api/posts/[id]/comments
+// GET /api/lps/[id]/comments
 export async function GET(
   _req: Request,
-  ctx: RouteContext<"/api/posts/[id]/comments">
+  ctx: RouteContext<"/api/lps/[id]/comments">
 ) {
-  const { id: post_id } = await ctx.params;
-
+  const { id: lp_id } = await ctx.params;
   const { data, error } = await supabase
-    .from("comments")
+    .from("lp_comments")
     .select("*, profiles!user_id(id, username, nickname, avatar_url, avatar_color)")
-    .eq("post_id", post_id)
-    .order("created_at", { ascending: true });
-
+    .eq("lp_id", lp_id)
+    .order("created_at", { ascending: false });
   if (error) return Response.json({ error: error.message }, { status: 500 });
   return Response.json(data ?? []);
 }
 
-// POST /api/posts/[id]/comments
+// POST /api/lps/[id]/comments
 export async function POST(
   request: Request,
-  ctx: RouteContext<"/api/posts/[id]/comments">
+  ctx: RouteContext<"/api/lps/[id]/comments">
 ) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  const { id: post_id } = await ctx.params;
+  const { id: lp_id } = await ctx.params;
   const { content } = await request.json();
-
   if (!content?.trim()) {
     return Response.json({ error: "내용을 입력해주세요." }, { status: 400 });
   }
-
   const { data, error } = await supabase
-    .from("comments")
-    .insert({ post_id, user_id: session.user.id, content: content.trim() })
+    .from("lp_comments")
+    .insert({ lp_id, user_id: session.user.id, content: content.trim() })
     .select("*, profiles!user_id(id, username, nickname, avatar_url, avatar_color)")
     .single();
-
   if (error) return Response.json({ error: error.message }, { status: 500 });
-
-  await supabase.rpc("increment_comment_count", { p_post_id: post_id });
-
-  // 알림: 게시글 작성자에게
-  const { data: post } = await supabase.from("posts").select("user_id, title").eq("id", post_id).maybeSingle();
-  if (post && post.user_id !== session.user.id) {
-    await supabase.from("notifications").insert({
-      user_id: post.user_id,
-      actor_id: session.user.id,
-      type: "comment",
-      target_type: "post",
-      target_id: post_id,
-      content: `회원님의 글에 댓글을 달았습니다: "${content.trim().slice(0, 50)}"`,
-    });
-  }
-
   return Response.json(data, { status: 201 });
 }

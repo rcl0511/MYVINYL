@@ -8,7 +8,7 @@ export const MOCK_LPS: LP[] = [
     year: 2010,
     genre: "Indie Rock",
     label: "Pastel Music",
-    coverUrl: "https://archive.org/download/mbid-10fd49e3-9721-46a4-8ce4-009f3467db64/mbid-10fd49e3-9721-46a4-8ce4-009f3467db64-14102613903_thumb500.jpg",
+    coverUrl: "https://coverartarchive.org/release/10fd49e3-9721-46a4-8ce4-009f3467db64/front-500.jpg",
     coverColor: "#DC2626",
     vinylStyle: "red",
     playCount: 184200,

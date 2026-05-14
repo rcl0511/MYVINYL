@@ -24,7 +24,6 @@ export async function POST(
     .maybeSingle();
 
   if (existing) {
-    // 좋아요 취소
     await supabase
       .from("post_likes")
       .delete()
@@ -33,9 +32,21 @@ export async function POST(
     await supabase.rpc("decrement_post_like", { p_post_id: post_id });
     return Response.json({ liked: false });
   } else {
-    // 좋아요 추가
     await supabase.from("post_likes").insert({ user_id, post_id });
     await supabase.rpc("increment_post_like", { p_post_id: post_id });
+
+    // 알림: 게시글 작성자에게 (본인 글이면 스킵)
+    const { data: post } = await supabase.from("posts").select("user_id, title").eq("id", post_id).maybeSingle();
+    if (post && post.user_id !== user_id) {
+      await supabase.from("notifications").insert({
+        user_id: post.user_id,
+        actor_id: user_id,
+        type: "like_post",
+        target_type: "post",
+        target_id: post_id,
+        content: `회원님의 글 "${post.title?.slice(0, 30) ?? ""}"에 좋아요를 눌렀습니다.`,
+      });
+    }
     return Response.json({ liked: true });
   }
 }

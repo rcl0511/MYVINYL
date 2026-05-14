@@ -7,20 +7,31 @@ import AuthModal from "@/components/AuthModal";
 import type { LP } from "@/lib/types";
 import { SPLATTER_STROKES } from "@/lib/splatter-vinyl";
 
-export default function LPCard({ lp, isAuthenticated, priority }: { lp: LP; isAuthenticated?: boolean; priority?: boolean }) {
-  const [liked, setLiked] = useState(false);
+export default function LPCard({ lp, isAuthenticated, priority, initialLiked }: { lp: LP; isAuthenticated?: boolean; priority?: boolean; initialLiked?: boolean }) {
+  const [liked, setLiked] = useState(!!initialLiked);
+  const [pendingLike, setPendingLike] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [vinylColor, setVinylColor] = useState(lp.coverColor);
 
-  // ── 1. 글리터 설정 (아크릴 계열 전용) ──
+  useEffect(() => {
+    setLiked(!!initialLiked);
+  }, [initialLiked]);
+
+  // ── 1. 글리터 설정 (아크릴 계열 전용) — lp.id 기반 결정적 난수로 SSR 하이드레이션 미스매치 방지 ──
   const glitters = useMemo(() => {
-    return Array.from({ length: 600 }).map((_, i) => ({
-      cx: Math.random() * 100,
-      cy: Math.random() * 100,
-      r: 0.06 + Math.random() * 0.12,
-      opacity: 0.7 + Math.random() * 0.3,
+    let seed = 0;
+    for (let i = 0; i < lp.id.length; i++) seed = (seed * 31 + lp.id.charCodeAt(i)) >>> 0;
+    const rand = () => {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 0xffffffff;
+    };
+    return Array.from({ length: 600 }).map(() => ({
+      cx: rand() * 100,
+      cy: rand() * 100,
+      r: 0.06 + rand() * 0.12,
+      opacity: 0.7 + rand() * 0.3,
     }));
-  }, []);
+  }, [lp.id]);
 
   useEffect(() => {
     try {
@@ -32,14 +43,27 @@ export default function LPCard({ lp, isAuthenticated, priority }: { lp: LP; isAu
     } catch {}
   }, [lp.id]);
 
-  function handleLike(e: React.MouseEvent) {
+  async function handleLike(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
     if (!isAuthenticated) {
       setShowAuthModal(true);
       return;
     }
-    setLiked((v) => !v);
+    if (pendingLike) return;
+    const prev = liked;
+    setLiked(!prev); // optimistic
+    setPendingLike(true);
+    try {
+      const res = await fetch(`/api/lps/${lp.id}/like`, { method: "POST" });
+      if (!res.ok) throw new Error();
+      const { liked: newState } = await res.json();
+      setLiked(newState);
+    } catch {
+      setLiked(prev); // revert
+    } finally {
+      setPendingLike(false);
+    }
   }
 
   const style = (lp.vinylStyle || "color").toLowerCase();
@@ -121,7 +145,6 @@ export default function LPCard({ lp, isAuthenticated, priority }: { lp: LP; isAu
                   
                   {/* 중앙 라벨 (TEAM BABY 특유의 감성) */}
                   <circle cx="50" cy="50" r="13.5" fill="#e8dec5" />
-                  {lp.coverUrl && <image href={lp.coverUrl} x="37.5" y="37.5" height="25" width="25" clipPath="circle(50%)" preserveAspectRatio="xMidYMid slice" />}
                 </g>
               ) : (isRed || isEmerald) ? (
                 /* ── [201 & TEEN TROUBLES] 딥 아크릴 + 글리터 강화 버전 ── */
@@ -137,7 +160,6 @@ export default function LPCard({ lp, isAuthenticated, priority }: { lp: LP; isAu
                   ))}
                   <circle cx="50" cy="50" r="49.5" fill={`url(#acrylicShine-${lp.id})`} />
                   <circle cx="50" cy="50" r="13.5" fill="white" />
-                  {lp.coverUrl && <image href={lp.coverUrl} x="36.5" y="36.5" height="27" width="27" clipPath="circle(50%)" preserveAspectRatio="xMidYMid slice" />}
                 </g>
               ) : isMarble ? (
                 /* ── [THIRSTY] 스모크 마블 (글리터 없음) ── */
@@ -162,6 +184,29 @@ export default function LPCard({ lp, isAuthenticated, priority }: { lp: LP; isAu
               
               <circle cx="50" cy="50" r="2.5" fill="#1a1612"/><circle cx="50" cy="50" r="1.5" fill="#0e0c0a"/>
             </svg>
+
+            {/* Center label cover — HTML overlay (Next/Image 최적화) */}
+            {lp.coverUrl && (isSplatter || isRed || isEmerald) && (
+              <div
+                className="absolute rounded-full overflow-hidden pointer-events-none"
+                style={{
+                  width: "27%",
+                  aspectRatio: "1",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                }}
+                aria-hidden
+              >
+                <Image
+                  src={lp.coverUrl}
+                  alt=""
+                  fill
+                  sizes="80px"
+                  className="object-cover"
+                />
+              </div>
+            )}
           </div>
 
           {/* 슬리브 (클릭 가능하도록 Link로 감쌈) */}
@@ -171,7 +216,15 @@ export default function LPCard({ lp, isAuthenticated, priority }: { lp: LP; isAu
             style={{ width: "66.67%", boxShadow: "10px 0 30px rgba(0,0,0,0.3)" }}
           >
             {lp.coverUrl ? (
-              <Image src={lp.coverUrl} alt={lp.title} fill className="object-cover" priority={priority} />
+              <Image
+                src={lp.coverUrl}
+                alt={lp.title}
+                fill
+                className="object-cover"
+                priority={priority}
+                loading={priority ? undefined : "lazy"}
+                sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 220px"
+              />
             ) : (
               <div className="w-full h-full" style={{ backgroundColor: lp.coverColor }}/>
             )}

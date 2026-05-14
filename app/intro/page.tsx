@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-
-// 서버-클라이언트 동일한 값을 쓰기 위해 고정 데이터 사용 (hydration mismatch 방지)
-const GROOVE_COUNTS = 18;
+import BrandLogo from "@/components/BrandLogo";
 
 export default function IntroPage() {
   const [mounted, setMounted] = useState(false);
@@ -40,83 +38,66 @@ export default function IntroPage() {
           transition: "opacity 0.6s ease, transform 0.6s ease",
         }}
       >
-        {/* ── 바이닐 레코드 ── */}
-        <div className="relative w-44 h-44 mx-auto mb-14">
+        {/* ── 로고 ── */}
+        <div className="relative w-44 h-44 mx-auto mb-12">
           {/* 외부 글로우 */}
           <div
             className="absolute inset-0 rounded-full pointer-events-none"
             style={{
-              transform: "scale(1.25)",
-              background: "radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%)",
+              transform: "scale(1.3)",
+              background: "radial-gradient(circle, rgba(245,158,11,0.14) 0%, transparent 70%)",
               filter: "blur(20px)",
             }}
           />
-
-          {/* 레코드 본체 */}
           <div
-            className="w-full h-full rounded-full relative"
+            className="relative w-full h-full"
             style={{
-              background: "linear-gradient(135deg, #1a1a1a 0%, #111111 50%, #1e1e1e 100%)",
-              boxShadow:
-                "0 24px 80px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.04)",
-              animation: mounted ? "spin-vinyl 5s linear infinite" : "none",
+              animation: mounted ? "spin-vinyl 14s linear infinite" : "none",
+              transformOrigin: "center",
             }}
           >
-            {/* 그루브 링 */}
-            {Array.from({ length: GROOVE_COUNTS }).map((_, i) => (
-              <div
-                key={i}
-                className="absolute rounded-full"
-                style={{
-                  inset: `${10 + i * 5}px`,
-                  border: "1px solid rgba(255,255,255,0.025)",
-                }}
-              />
-            ))}
-
-            {/* 센터 라벨 */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div
-                className="w-[36%] h-[36%] rounded-full flex items-center justify-center"
-                style={{
-                  background:
-                    "linear-gradient(140deg, #B45309 0%, #D97706 45%, #92400E 100%)",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1)",
-                }}
-              >
-                <span
-                  className="text-amber-100 font-bold"
-                  style={{ fontSize: "13px", letterSpacing: "0.05em", textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}
-                >
-                  LP
-                </span>
-              </div>
-            </div>
-
-            {/* 스핀들 홀 */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div
-                className="w-2 h-2 rounded-full"
-                style={{ background: "#0C0C0C", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.8)" }}
-              />
-            </div>
+            <BrandLogo size={176} withShadow={false} />
           </div>
         </div>
 
         {/* ── 브랜드 이름 ── */}
         <h1
-          className="text-white font-bold mb-3"
-          style={{ fontSize: "clamp(2.5rem, 8vw, 3.5rem)", letterSpacing: "-0.035em", lineHeight: 1 }}
+          className="mb-3 flex items-baseline justify-center gap-2 sm:gap-3 flex-wrap"
+          style={{ fontSize: "clamp(2.2rem, 7vw, 3.4rem)", letterSpacing: "-0.025em", lineHeight: 1 }}
         >
-          LP Player
+          <span
+            className="text-white"
+            style={{
+              fontFamily: "var(--font-diary), 'Fraunces', Georgia, serif",
+              fontWeight: 600,
+            }}
+          >
+            Turntable
+          </span>
+          <span
+            style={{
+              fontFamily: "var(--font-diary), 'Fraunces', Georgia, serif",
+              fontStyle: "italic",
+              fontWeight: 500,
+              color: "rgba(245,158,11,0.92)",
+              letterSpacing: "-0.01em",
+            }}
+          >
+            Diary
+          </span>
         </h1>
 
         {/* ── 태그라인 ── */}
         <p
-          className="text-sm mb-10"
-          style={{ color: "rgba(255,255,255,0.35)", letterSpacing: "0.12em", fontWeight: 300 }}
+          className="mb-10"
+          style={{
+            color: "rgba(255,255,255,0.45)",
+            letterSpacing: "0.08em",
+            fontWeight: 300,
+            fontSize: "0.95rem",
+          }}
         >
-          아날로그 감성, 디지털로 재생
+          음악으로 쓰는 일지
         </p>
 
         {/* ── 구분선 + 스펙 정보 ── */}
@@ -139,34 +120,33 @@ export default function IntroPage() {
         <div className="grid grid-cols-3 gap-3 mb-10">
           {[
             {
-              label: "스트리밍",
-              desc: "YouTube 연동",
-              icon: (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M9 18V5l12-2v13" />
-                  <circle cx="6" cy="18" r="3" />
-                  <circle cx="18" cy="16" r="3" />
-                </svg>
-              ),
-            },
-            {
-              label: "턴테이블",
-              desc: "가상 재생",
-              icon: (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <circle cx="12" cy="12" r="9" />
-                  <circle cx="12" cy="12" r="3" />
-                  <path d="M12 3v2M12 19v2M3 12h2M19 12h2" />
-                </svg>
-              ),
-            },
-            {
-              label: "커스텀 LP",
-              desc: "나만의 음반",
+              label: "감상 기록",
+              desc: "오늘의 LP",
               icon: (
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M12 20h9" />
                   <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+                </svg>
+              ),
+            },
+            {
+              label: "내 컬렉션",
+              desc: "좋아한 LP",
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <circle cx="12" cy="12" r="9" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              ),
+            },
+            {
+              label: "함께 듣기",
+              desc: "음악 친구",
+              icon: (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
                 </svg>
               ),
             },
@@ -234,7 +214,7 @@ export default function IntroPage() {
         className="absolute bottom-8 text-xs"
         style={{ color: "rgba(255,255,255,0.12)", letterSpacing: "0.06em" }}
       >
-        © 2026 LP Player
+        © 2026 Turntable Diary
       </p>
 
       <style>{`

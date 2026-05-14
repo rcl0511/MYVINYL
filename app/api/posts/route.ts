@@ -10,7 +10,7 @@ export async function GET(request: Request) {
 
   let query = supabase
     .from("posts")
-    .select("*, profiles(id, nickname, avatar_url, avatar_color)")
+    .select("*, profiles!user_id(id, username, nickname, avatar_url, avatar_color)")
     .order("created_at", { ascending: false })
     .limit(50);
 
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
       content: content.trim(),
       tag: tag ?? "음악 이야기",
     })
-    .select("*, profiles(id, nickname, avatar_url, avatar_color)")
+    .select("*, profiles!user_id(id, username, nickname, avatar_url, avatar_color)")
     .single();
 
   if (error) return Response.json({ error: error.message }, { status: 500 });

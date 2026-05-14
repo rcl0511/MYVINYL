@@ -1,6 +1,7 @@
 import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { supabase } from "@/lib/supabase";
+import { generateUniqueUsername } from "@/lib/username";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -17,15 +18,32 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async signIn({ user }) {
-      // 로그인 시 프로필 upsert (최초 1회 생성, 이후 avatar_url/nickname만 갱신)
-      await supabase.from("profiles").upsert(
-        {
+      // 최초 1회: username 생성. 이후 호출은 nickname/avatar만 갱신.
+      const { data: existing } = await supabase
+        .from("profiles")
+        .select("id, username")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (!existing) {
+        const seed = (user.name || user.email?.split("@")[0]) ?? "user";
+        const username = await generateUniqueUsername(seed);
+        await supabase.from("profiles").insert({
           id: user.id,
+          username,
           nickname: user.name ?? "사용자",
           avatar_url: user.image ?? null,
-        },
-        { onConflict: "id", ignoreDuplicates: false }
-      );
+        });
+      } else {
+        await supabase
+          .from("profiles")
+          .update({
+            nickname: user.name ?? "사용자",
+            avatar_url: user.image ?? null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", user.id);
+      }
       return true;
     },
     session({ session, token }) {

@@ -39,6 +39,14 @@ export async function POST(
     await supabase.from("follows").insert({ follower_id, following_id });
     await supabase.rpc("increment_follower_count", { p_user_id: following_id });
     await supabase.rpc("increment_following_count", { p_user_id: follower_id });
+    await supabase.from("notifications").insert({
+      user_id: following_id,
+      actor_id: follower_id,
+      type: "follow",
+      target_type: "profile",
+      target_id: follower_id,
+      content: "회원님을 팔로우하기 시작했습니다.",
+    });
     return Response.json({ following: true });
   }
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useMemo, useRef, useCallback, useState } from "react";
+import Image from "next/image";
 import type { LP, PlayerState, LPSide } from "@/lib/types";
 import { SPLATTER_STROKES } from "@/lib/splatter-vinyl";
 
@@ -29,6 +30,22 @@ export default function Turntable({
   stateRef.current = state;
 
   const isPlaying = state === "playing";
+
+  /* ── 글리터 (결정적 — SSR 하이드레이션 미스매치 방지) ── */
+  const glitters = useMemo(() => {
+    let seed = 0;
+    for (let i = 0; i < lp.id.length; i++) seed = (seed * 31 + lp.id.charCodeAt(i)) >>> 0;
+    const rand = () => {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 0xffffffff;
+    };
+    return Array.from({ length: 600 }).map(() => ({
+      cx: rand() * 100,
+      cy: rand() * 100,
+      r: 0.06 + rand() * 0.12,
+      opacity: 0.7 + rand() * 0.3,
+    }));
+  }, [lp.id]);
 
   /* ─── scale util ─── */
   const px = (n: number) => Math.round((n / 520) * size);
@@ -245,22 +262,15 @@ export default function Turntable({
               <g clipPath={`url(#vclip-${lp.id})`}>
                 <circle cx="50" cy="50" r="49.5" fill={`url(#${isRed ? 'red' : 'emerald'}Acrylic-${lp.id})`} />
                 <g>
-                  {Array.from({ length: 600 }).map((_, i) => {
-                    const g = {
-                      cx: Math.random() * 100,
-                      cy: Math.random() * 100,
-                      r: 0.06 + Math.random() * 0.12,
-                      opacity: 0.7 + Math.random() * 0.3,
-                    };
-                    return <circle key={i} cx={g.cx} cy={g.cy} r={g.r} fill="#ffffff" opacity={g.opacity} />;
-                  })}
+                  {glitters.map((g, i) => (
+                    <circle key={i} cx={g.cx} cy={g.cy} r={g.r} fill="#ffffff" opacity={g.opacity} />
+                  ))}
                 </g>
                 {[46, 42.5, 39, 35.5, 32, 28.5, 25, 21.5, 18].map((r) => (
                   <circle key={r} cx="50" cy="50" r={r} fill="none" stroke="white" strokeWidth="0.08" opacity="0.1"/>
                 ))}
                 <circle cx="50" cy="50" r="49.5" fill={`url(#acrylicShine-${lp.id})`} />
                 <circle cx="50" cy="50" r="13.5" fill="white" />
-                {lp.coverUrl && <image href={lp.coverUrl} x="36.5" y="36.5" height="27" width="27" clipPath="circle(50%)" preserveAspectRatio="xMidYMid slice" />}
               </g>
             ) : isMarble ? (
               /* ── [THIRSTY] 스모크 마블 (글리터 없음) ── */
@@ -285,6 +295,30 @@ export default function Turntable({
 
             <circle cx="50" cy="50" r="2.5" fill="#1a1612"/><circle cx="50" cy="50" r="1.5" fill="#0e0c0a"/>
           </svg>
+
+          {/* Center label cover — HTML overlay (Next/Image 최적화, 디스크와 함께 회전) */}
+          {lp.coverUrl && (isRed || isEmerald) && (
+            <div
+              className="absolute rounded-full overflow-hidden pointer-events-none"
+              style={{
+                width: "27%",
+                aspectRatio: "1",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+              }}
+              aria-hidden
+            >
+              <Image
+                src={lp.coverUrl}
+                alt=""
+                fill
+                sizes="240px"
+                className="object-cover"
+                priority
+              />
+            </div>
+          )}
         </div>
 
         {/* ── [수정] Tonearm - 금속 질감 강화 및 디테일 추가 ── */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import LPCard from "@/components/lp/LPCard";
 import Chip from "@/components/ui/Chip";
@@ -11,6 +11,18 @@ export default function BrowsePage() {
   const isAuthenticated = status === "authenticated";
   const [selectedGenre, setSelectedGenre] = useState("전체");
   const [query, setQuery] = useState("");
+  const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setLikedIds(new Set());
+      return;
+    }
+    fetch("/api/lp-likes/me")
+      .then((r) => r.json())
+      .then((d) => setLikedIds(new Set(d.ids ?? [])))
+      .catch(() => {});
+  }, [isAuthenticated]);
 
   const filtered = MOCK_LPS.filter((lp) => {
     const matchGenre = selectedGenre === "전체" || lp.genre === selectedGenre;
@@ -84,7 +96,7 @@ export default function BrowsePage() {
       {filtered.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
           {filtered.map((lp, i) => (
-            <LPCard key={lp.id} lp={lp} isAuthenticated={isAuthenticated} priority={i < 8} />
+            <LPCard key={lp.id} lp={lp} isAuthenticated={isAuthenticated} priority={i < 8} initialLiked={likedIds.has(lp.id)} />
           ))}
         </div>
       ) : (
